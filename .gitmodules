@@ -1,0 +1,3 @@
+[submodule "extern/fusnic"]
+	path = extern/fusnic
+	url = https://github.com/guillaumeblanc/fusnic.git
