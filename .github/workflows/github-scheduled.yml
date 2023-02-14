@@ -28,10 +28,3 @@ jobs:
         with:
           name: collected-data
           path: output/
-      - name: Upload to gdrive
-        uses: mathisve/gdrive-upload-action@main
-        with:
-          filename: output/*
-          folderId: ${{ secrets.GDRIVE_FOLDER }}
-          credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
-          encoded: true
