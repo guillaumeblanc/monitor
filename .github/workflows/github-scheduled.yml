@@ -20,7 +20,6 @@ jobs:
         run: |
           pip install -r extern/fusnic/requirements.txt
           pip install -r requirements.txt
-            - name: Collect data
       - name: Collect data
         run: python collect_fusionsolar.py -o output -u ${{secrets.FUSIONSOLAR_USER}} -p ${{secrets.FUSIONSOLAR_PASSWORD}}
       - name: Uploads artifacts
@@ -28,3 +27,10 @@ jobs:
         with:
           name: collected-data
           path: output/
+      - name: Upload to gdrive
+        uses: mathisve/gdrive-upload-action@main
+        with:
+          filename: output/*
+          folderId: ${{ secrets.GDRIVE_FOLDER }}
+          credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
+          encoded: true
