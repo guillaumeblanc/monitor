@@ -28,9 +28,9 @@ jobs:
           name: collected-data
           path: output/
       - name: Upload to gdrive
-        uses: mathisve/gdrive-upload-action@main
+        uses: adityak74/google-drive-upload-git-action@main
         with:
-          filename: output/yearly.csv
-          folderId: ${{ secrets.GDRIVE_FOLDER }}
           credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
-          encoded: true
+          filename: "output/*"
+          folderId: ${{ secrets.GDRIVE_FOLDER }}
+          overwrite: "true" # optional booleans
