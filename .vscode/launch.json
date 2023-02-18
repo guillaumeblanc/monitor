@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Python: Collect Fusion Solar",
             "type": "python",
             "request": "launch",
             "program": "${file}",
@@ -16,6 +16,23 @@
                 "${env:FUSIONSOLAR_USER}",
                 "-p",
                 "${env:FUSIONSOLAR_PASSWORD}"
+            ]
+        },
+        {
+            "name": "Python: Google Drive",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "download",
+                "-l",
+                "somedir",
+                "-d",
+                "${env:GDRIVE_FOLDER}",
+                "-c",
+                "${env:GDRIVE_CREDENTIALS}"
             ]
         }
     ]

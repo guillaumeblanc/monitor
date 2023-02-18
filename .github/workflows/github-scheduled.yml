@@ -27,10 +27,5 @@ jobs:
         with:
           name: collected-data
           path: output/
-      - name: Upload to gdrive
-        uses: adityak74/google-drive-upload-git-action@main
-        with:
-          credentials: ${{ secrets.GDRIVE_CREDENTIALS }}
-          filename: "output/*"
-          folderId: ${{ secrets.GDRIVE_FOLDER }}
-          overwrite: "true" # optional booleans
+      - name: Upload to Google Drive
+        run: python gdrive.py upload -l output -d ${{secrets.GDRIVE_FOLDER}} -c ${{secrets.GDRIVE_CREDENTIALS}}
