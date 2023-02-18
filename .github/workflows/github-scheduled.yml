@@ -21,11 +21,40 @@ jobs:
           pip install -r extern/fusnic/requirements.txt
           pip install -r requirements.txt
       - name: Collect data
-        run: python collect_fusionsolar.py -o output -u ${{secrets.FUSIONSOLAR_USER}} -p ${{secrets.FUSIONSOLAR_PASSWORD}}
+        run: |
+          mkdir output
+          python collect_fusionsolar.py -o output -u ${{secrets.FUSIONSOLAR_USER}} -p ${{secrets.FUSIONSOLAR_PASSWORD}}
       - name: Uploads artifacts
         uses: actions/upload-artifact@v3
         with:
           name: collected-data
-          path: output/
+          path: output
+  Update:
+    needs: Collect
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install python dependencies
+        run: |
+          pip install -r requirements.txt
+      - name: Download to Google Drive
+        run: |
+          mkdir old
+          python gdrive.py download -l old -d ${{secrets.GDRIVE_FOLDER}} -c ${{secrets.GDRIVE_CREDENTIALS}}
+      - name: Download latest artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: collected-data
+          path: latest
       - name: Upload to Google Drive
-        run: python gdrive.py upload -l output -d ${{secrets.GDRIVE_FOLDER}} -c ${{secrets.GDRIVE_CREDENTIALS}}
+        run: |
+          mkdir new
+          python gdrive.py upload -l new -d ${{secrets.GDRIVE_FOLDER}} -c ${{secrets.GDRIVE_CREDENTIALS}}
