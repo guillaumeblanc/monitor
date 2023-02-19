@@ -44,10 +44,10 @@ jobs:
       - name: Install python dependencies
         run: |
           pip install -r requirements.txt
-      - name: Download to Google Drive
+      - name: Download from Google Drive
         run: |
-          mkdir old
-          python gdrive.py download -l old -d ${{secrets.GDRIVE_FOLDER}} -c ${{secrets.GDRIVE_CREDENTIALS}}
+          mkdir previous
+          python gdrive.py download -l previous -d ${{secrets.GDRIVE_FOLDER}} -c ${{secrets.GDRIVE_CREDENTIALS}}
       - name: Download latest artifacts
         uses: actions/download-artifact@v3
         with:
@@ -56,6 +56,7 @@ jobs:
       - name: Update data
         run: |
           mkdir updated
+          python update_fusionsolar.py -p previous -l latest -u updated
       - name: Uploads artifacts
         uses: actions/upload-artifact@v3
         with:

@@ -15,7 +15,25 @@
                 "-u",
                 "${env:FUSIONSOLAR_USER}",
                 "-p",
-                "${env:FUSIONSOLAR_PASSWORD}"
+                "${env:FUSIONSOLAR_PASSWORD}",
+                "-o",
+                "latest"
+            ]
+        },
+        {
+            "name": "Python: Update Fusion Solar data",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-p",
+                "previous",
+                "-l",
+                "latest",
+                "-u",
+                "updated"
             ]
         },
         {
