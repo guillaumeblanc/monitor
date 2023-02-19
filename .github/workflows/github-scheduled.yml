@@ -54,7 +54,14 @@ jobs:
         with:
           name: collected-data
           path: latest
+      - name: Update data
+        run: |
+          mkdir updated
+      - name: Uploads artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: updated-data
+          path: updated
       - name: Upload to Google Drive
         run: |
-          mkdir new
-          python gdrive.py upload -l new -d ${{secrets.GDRIVE_FOLDER}} -c ${{secrets.GDRIVE_CREDENTIALS}}
+          python gdrive.py upload -l updated -d ${{secrets.GDRIVE_FOLDER}} -c ${{secrets.GDRIVE_CREDENTIALS}}
