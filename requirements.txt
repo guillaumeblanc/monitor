@@ -1,4 +1,4 @@
+-r extern/fusnic/requirements.txt
 pandas
 argparse
 pydrive
-oauth2client
