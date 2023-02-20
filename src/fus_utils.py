@@ -16,18 +16,22 @@ def flatten(data):
             line['collectTime'] = entry['collectTime']
         yield line
 
+
 def fixup_time(df):
-    def fixup_time_col(df:pd.DataFrame, col:str):
+    def fixup_time_col(df: pd.DataFrame, col: str):
         if col in df:
-            df[col] = df[col].map(lambda t: datetime.datetime.fromtimestamp(t / 1000.))
+            df[col] = df[col].map(
+                lambda t: datetime.datetime.fromtimestamp(t / 1000.))
 
     fixup_time_col(df, 'collectTime')
     return df
+
 
 def to_csv(data: list, path: Path):
     '''
     Dumps list of entries to csv.
     '''
+
     new = pd.DataFrame(data)
     new.fillna("", inplace=True)
     new.to_csv(path, index=False)

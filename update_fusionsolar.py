@@ -28,10 +28,10 @@ def update(previous: Path, latest: Path, updated: Path):
                 pdata = fus_utils.from_csv(pfile)
             except (pd.errors.EmptyDataError, FileNotFoundError):
                 logging.info(
-                    'Empty data for previous file: %s. Using latest.' % pfile)
+                    'No/empty data for previous file: %s. Using latest.' % pfile)
                 pass
             else:
-                # Updates with new lines
+                # Updates with new lines (only)
                 udata = pd.concat([ldata, pdata]).drop_duplicates()
 
             ufile = updated / lfile.name
