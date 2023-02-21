@@ -4,7 +4,7 @@ on:
   #schedule:
   #  - cron: '*/15 6-22 * * *'
 jobs:
-  Collect:
+  FusionSolar_Collect:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,14 +22,14 @@ jobs:
       - name: Collect data
         run: |
           mkdir output
-          python fus_collect.py -o output -u ${{secrets.FUSIONSOLAR_USER}} -p ${{secrets.FUSIONSOLAR_PASSWORD}}
+          python collect_fus.py -o output -u ${{secrets.FUSIONSOLAR_USER}} -p ${{secrets.FUSIONSOLAR_PASSWORD}}
       - name: Uploads artifacts
         uses: actions/upload-artifact@v3
         with:
           name: collected-data
           path: output
-  Update:
-    needs: Collect
+  FusionSolar_Update:
+    needs: FusionSolar_Collect
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -56,7 +56,7 @@ jobs:
       - name: Update data
         run: |
           mkdir updated
-          python fus_update.py -p previous -l latest -u updated
+          python update_std.py -p previous -l latest -u updated
       - name: Uploads artifacts
         uses: actions/upload-artifact@v3
         with:

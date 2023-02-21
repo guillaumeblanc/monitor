@@ -1,9 +1,13 @@
 import logging
+import sys
 import argparse
 from pathlib import Path
 from datetime import datetime, timezone
 
 from extern.fusnic import fusnic
+# from extern.fusnic.fusnic.tests.mock_session import MockSession
+
+import src.std_utils as std_utils
 import src.fus_utils as fus_utils
 
 
@@ -22,7 +26,8 @@ def collect(output: Path, username: str, password: str):
             logging.info('- Found ' + str(len(plants)) + ' plants:')
             [logging.info(' - ' + plant['stationName'] +
                           ' (' + plant['stationCode'] + ')') for plant in plants]
-            fus_utils.to_csv(plants, output / ('plants.csv'))
+            std_utils.to_csv(plants, output /
+                             std_utils.format_filename('plants', now))
 
             # Extract the list of plants code
             plants_code = [plant['stationCode'] for plant in plants]
@@ -31,35 +36,36 @@ def collect(output: Path, username: str, password: str):
             logging.info('Querying realtime data.')
             realtime = client.get_plant_realtime_data(plants_code)
             logging.info('- Found ' + str(len(realtime)) + ' realtime data')
-            fus_utils.to_csv(fus_utils.flatten(realtime), output /
-                             ('realtime_' + now.strftime('%Y-%m-%d') + '.csv'))
+            std_utils.to_csv(fus_utils.flatten(realtime), output /
+                             std_utils.format_filename('realtime', now))
 
             # Hourly data
             logging.info('Querying hourly data.')
             hourly = client.get_plant_hourly_data(plants_code, now)
             logging.info('- Found ' + str(len(hourly)) + ' hourly data')
-            fus_utils.to_csv(fus_utils.flatten(hourly), output /
-                             ('hourly_' + now.strftime('%Y-%m-%d') + '.csv'))
+            std_utils.to_csv(fus_utils.flatten(hourly), output /
+                             std_utils.format_filename('hourly', now))
 
             # Daily data
             logging.info('Querying daily data.')
             daily = client.get_plant_daily_data(plants_code, now)
             logging.info('- Found ' + str(len(daily)) + ' daily data')
-            fus_utils.to_csv(fus_utils.flatten(daily), output /
-                             ('daily_' + now.strftime('%Y-%m') + '.csv'))
+            std_utils.to_csv(fus_utils.flatten(daily), output /
+                             std_utils.format_filename('daily', now))
 
             # Monthly data
             logging.info('Querying monthly data.')
             monthly = client.get_plant_monthly_data(plants_code, now)
             logging.info('- Found ' + str(len(monthly)) + ' monthly data')
-            fus_utils.to_csv(fus_utils.flatten(monthly), output /
-                             ('monthly_' + now.strftime('%Y') + '.csv'))
+            std_utils.to_csv(fus_utils.flatten(monthly), output /
+                             std_utils.format_filename('monthly', now))
 
             # Yearly data
             logging.info('Querying yearly data.')
             yearly = client.get_plant_yearly_data(plants_code, now)
             logging.info('- Found ' + str(len(yearly)) + ' yearly data')
-            fus_utils.to_csv(fus_utils.flatten(yearly), output / 'yearly.csv')
+            std_utils.to_csv(fus_utils.flatten(yearly), output /
+                             std_utils.format_filename('yearly', now))
 
     except fusnic.LoginFailed:
         sys.exit(

@@ -1,53 +1,24 @@
 from pathlib import Path
 import csv
 import datetime
-import glob
 import pandas as pd
 
 
 def flatten(data):
     '''
     Convert list of dataItemMap to a flat list of data.
+    Fixup also non standard units, like time
     '''
+    
+    def fixup_time(timestamp):
+        return datetime.datetime.fromtimestamp(timestamp / 1000.)
+
     for entry in data:
         line = entry['dataItemMap']
         line['stationCode'] = entry['stationCode']
         if entry.get('collectTime'):
-            line['collectTime'] = entry['collectTime']
+            line['collectTime'] = fixup_time(entry['collectTime'])
         yield line
-
-
-def fixup_time(df):
-    def fixup_time_col(df: pd.DataFrame, col: str):
-        if col in df:
-            df[col] = df[col].map(
-                lambda t: datetime.datetime.fromtimestamp(t / 1000.))
-
-    fixup_time_col(df, 'collectTime')
-    return df
-
-
-def to_csv(data: list, path: Path):
-    '''
-    Dumps list of entries to csv.
-    '''
-
-    new = pd.DataFrame(data)
-    new.fillna("", inplace=True)
-    new.to_csv(path, index=False)
-
-
-def from_csv(path: Path):
-    return pd.read_csv(str(path))
-
-
-def from_csvs(path: Path, pattern: str):
-    '''
-    Returns a list (generator) of dataframe loaded from all csv files that matches the pattern.
-    '''
-    for filename in path.glob(pattern):
-        yield from_csv(filename)
-
 
 def description(parameter: str):
     '''

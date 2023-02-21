@@ -8,7 +8,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 from extern.fusnic import fusnic
-import src.fus_utils as fus_utils
+import src.std_utils as std_utils
 
 
 def update(previous: Path, latest: Path, updated: Path):
@@ -17,7 +17,7 @@ def update(previous: Path, latest: Path, updated: Path):
     '''
     for lfile in latest.glob('*.csv'):
         try:
-            udata = ldata = fus_utils.from_csv(lfile)
+            udata = ldata = std_utils.from_csv(lfile)
         except pd.errors.EmptyDataError:
             logging.info(
                 'Empty data for latest file: %s. Skipping update.' % lfile)
@@ -25,7 +25,7 @@ def update(previous: Path, latest: Path, updated: Path):
         else:
             pfile = previous / lfile.name
             try:
-                pdata = fus_utils.from_csv(pfile)
+                pdata = std_utils.from_csv(pfile)
             except (pd.errors.EmptyDataError, FileNotFoundError):
                 logging.info(
                     'No/empty data for previous file: %s. Using latest.' % pfile)
@@ -36,7 +36,7 @@ def update(previous: Path, latest: Path, updated: Path):
 
             ufile = updated / lfile.name
             logging.info('Updating file: %s' % ufile)
-            fus_utils.to_csv(udata, ufile)
+            std_utils.to_csv(udata, ufile)
 
 
 if __name__ == '__main__':
