@@ -60,7 +60,7 @@ class GoogleDriveClient(GoogleDrive):
             raise ValueError('Destination path %s does not exist' % str(local))
         if not local.is_dir():
             raise ValueError(
-                'Destination path %s must be a folder' % str(dest))
+                'Destination path %s must be a folder' % str(local))
         if not self.is_folder_id(remote_id):
             raise ValueError('Source id %s must be a folder' % str(remote_id))
 
