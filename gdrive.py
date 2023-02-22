@@ -1,8 +1,7 @@
 from oauth2client.service_account import ServiceAccountCredentials
 from pydrive.drive import GoogleDrive
 from pydrive.auth import GoogleAuth
-from pathlib import Path
-from pathlib import PurePath
+from pathlib import Path, PurePath
 import argparse
 import logging
 import base64
@@ -42,20 +41,20 @@ class GoogleDriveClient(GoogleDrive):
         file = self.CreateFile({'id': id})
         file.FetchMetadata()
 
-        def recurse(file, path: Path):
-            this_path = path / file['title']
-            yield (this_path, file)
-            if self.is_folder(file):
-                for inner in self.list_folder(file['id']):
-                    yield from recurse(inner, this_path)
-
         if self.is_folder(file):
+            def recurse(file, path: Path):
+                this_path = path / file['title']
+                yield (this_path, file)
+                if self.is_folder(file):
+                    for inner in self.list_folder(file['id']):
+                        yield from recurse(inner, this_path)
+
             return {path: f for inner in self.list_folder(file['id'])
                     for (path, f) in recurse(inner, Path())}
         else:
             return {Path(file['title']): file}
 
-    def download(self, local: Path, remote_id: str):
+    def download(self, local: Path, remote_id: str, remote_subfolder: Path):
         if not local.exists():
             raise ValueError('Destination path %s does not exist' % str(local))
         if not local.is_dir():
@@ -64,8 +63,18 @@ class GoogleDriveClient(GoogleDrive):
         if not self.is_folder_id(remote_id):
             raise ValueError('Source id %s must be a folder' % str(remote_id))
 
+        # Build remote tree of files / folder
         remote_tree = self._build_remote_tree(remote_id)
-        for path, file in sorted(remote_tree.items()):
+
+        # Filters for the requested subfolder
+        filtered_subtree = {k.relative_to(remote_subfolder): v for k, v in remote_tree.items(
+        ) if k.is_relative_to(remote_subfolder)}
+        if not filtered_subtree:
+            logging.info('No file found for subfolder %s',
+                         str(remote_subfolder))
+
+        # Download filtered tree
+        for path, file in sorted(filtered_subtree.items()):
             this_path = local / path
             if self.is_folder(file):
                 logging.info('Creating folder: %s, id: %s' %
@@ -76,7 +85,7 @@ class GoogleDriveClient(GoogleDrive):
                     path, file['id'], file['mimeType']))
                 file.GetContentFile(this_path)
 
-    def upload(self, local: Path, remote_id: str):
+    def upload(self, local: Path, remote_id: str, remote_subfolder: Path):
         if not local.exists():
             raise ValueError('Source path %s does not exist' % str(local))
         if not local.is_dir():
@@ -85,6 +94,7 @@ class GoogleDriveClient(GoogleDrive):
             raise ValueError(
                 'Destination id %s must be a folder' % str(remote_id))
 
+        # Gather local data and remote data
         local_tree = self._build_local_tree(local)
         remote_tree = self._build_remote_tree(remote_id)
 
@@ -93,24 +103,37 @@ class GoogleDriveClient(GoogleDrive):
                          ('folder' if is_dir else 'file', str(path)))
             meta = {'title': str(path.name),
                     'parents': [{'id': remote_id if len(
-                        path.parents) == 1 else remote_tree[path.parents[0]]['id']}],
+                        path.parents) == 1 else remote_tree[path.parent]['id']}],
                     'mimeType': 'application/vnd.google-apps.folder' if is_dir else ''}
             file = self.CreateFile(meta)
             file.Upload()
             return file
 
-        for path in sorted(local_tree):
-            full_path = local / path
-            is_dir = full_path.is_dir()
+        # Make sure remote subfolder exists
+        def parents(path: Path):
+            while len(path.parents):
+                yield path
+                path = path.parent
 
-            file = remote_tree.get(path, None)
+        for path in sorted(parents(remote_subfolder)):
+            if not remote_tree.get(path, None):
+                remote_tree[path] = _create_file(path, True)
+
+        # Upload local tree
+        for path in sorted(local_tree):
+            local_path = local / path
+            is_dir = local_path.is_dir()
+
+            remote_path = remote_subfolder / path
+            file = remote_tree.get(remote_path, None)
             if not file:
-                file = remote_tree[path] = _create_file(path, is_dir)
+                file = remote_tree[remote_path] = _create_file(
+                    remote_path, is_dir)
 
             if not is_dir:
                 logging.info('Uploading file: %s, id: %s, mine: %s' % (
                     str(path), file['id'], file['mimeType']))
-                file.SetContentFile(str(full_path))
+                file.SetContentFile(str(local_path))
                 file.Upload()
 
 
@@ -130,11 +153,13 @@ if __name__ == '__main__':
             raise ValueError
         return astring
 
-    parser.add_argument('direction', type=direction, help='upload/dowload')
+    parser.add_argument('direction', type=direction, help='upload/download')
     parser.add_argument('-l', '--local', default='',
                         help='Local directory path', required=True)
     parser.add_argument('-d', '--drive', default='',
                         help='Drive directory id.', required=True)
+    parser.add_argument('-s', '--drive_subfolder', default='.',
+                        help='Drive subfolder path.')
     parser.add_argument('-c', '--credentials', default='',
                         help='Google Service Account credentials as base64 string.', required=True)
     parser.add_argument('-ll', '--loglevel', default='info',
@@ -147,4 +172,4 @@ if __name__ == '__main__':
     auth = authenticate(key)
     with GoogleDriveClient(auth) as drive:
         to_call = drive.download if args.direction == 'download' else drive.upload
-        to_call(Path(args.local), args.drive)
+        to_call(Path(args.local), args.drive, Path(args.drive_subfolder))
