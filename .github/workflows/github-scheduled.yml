@@ -26,7 +26,7 @@ jobs:
       - name: Uploads artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: collected-data
+          name: fus_collected-data
           path: output
   FusionSolar_Update:
     needs: FusionSolar_Collect
@@ -47,16 +47,18 @@ jobs:
       - name: Download from Google Drive
         run: |
           mkdir previous
-          python gdrive.py download -l previous -d ${{secrets.GDRIVE_FOLDER}} -s fusion_solar -c ${{secrets.GDRIVE_CREDENTIALS}}
+          python gdrive.py download -l previous -d ${{secrets.GDRIVE_FOLDER}} -c ${{secrets.GDRIVE_CREDENTIALS}}
       - name: Download latest artifacts
         uses: actions/download-artifact@v3
         with:
-          name: collected-data
-          path: latest
+          name: fus_collected-data
+          path: latest/fusion_solar
       - name: Update data
         run: |
-          mkdir updated
-          python update_std.py -p previous -l latest -u updated
+          mkdir -p updated/fusion_solar
+          python update_std.py -p previous/fusion_solar -l latest/fusion_solar -u updated/fusion_solar
+          mkdir -p updated/std
+          python update_std.py -p previous/std -l latest/fusion_solar -u updated/std -r src/fus2std.json
       - name: Uploads artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -64,4 +66,4 @@ jobs:
           path: updated
       - name: Upload to Google Drive
         run: |
-          python gdrive.py upload -l updated -d ${{secrets.GDRIVE_FOLDER}} -s fusion_solar -c ${{secrets.GDRIVE_CREDENTIALS}}
+          python gdrive.py upload -l updated -d ${{secrets.GDRIVE_FOLDER}} -c ${{secrets.GDRIVE_CREDENTIALS}}
