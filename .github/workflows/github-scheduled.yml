@@ -33,9 +33,11 @@ jobs:
       - name: Setup python
         uses: ./extern/fusnic/.github/actions/setup_python
       - name: Download from Google Drive
-        run: |
-          mkdir previous
-          python gdrive.py download -l previous -d ${{secrets.GDRIVE_FOLDER}} -c ${{secrets.GDRIVE_CREDENTIALS}}
+        uses: ./.github/actions/gdrive_download
+        with:
+          local_folder: 'previous'
+          gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
+          gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
       - name: Download latest artifacts
         uses: actions/download-artifact@v3
         with:
@@ -53,5 +55,8 @@ jobs:
           name: updated-data
           path: updated
       - name: Upload to Google Drive
-        run: |
-          python gdrive.py upload -l updated -d ${{secrets.GDRIVE_FOLDER}} -c ${{secrets.GDRIVE_CREDENTIALS}}
+        uses: ./.github/actions/gdrive_upload
+        with:
+          local_folder: 'updated'
+          gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
+          gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}

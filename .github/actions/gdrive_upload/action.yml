@@ -1,0 +1,20 @@
+name: 'GDrive upload'
+description: 'Uploads to Google Drive'
+inputs:
+  local_folder:
+    description: 'Local source'
+    required: true
+  gdrive_folder_id:
+    description: 'Google Drive folder ID'
+    required: true
+  gdrive_credentials:
+    description: 'Google Drive base64 credentials'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Upload
+      shell: bash
+      run: |
+          mkdir -p ${{inputs.local_folder}}
+          python ./src/gdrive.py upload -l ${{inputs.local_folder}} -d ${{inputs.gdrive_folder_id}} -c ${{inputs.gdrive_credentials}}
