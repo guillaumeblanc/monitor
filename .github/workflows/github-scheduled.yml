@@ -16,7 +16,7 @@ jobs:
       - name: Collect data
         run: |
           mkdir output
-          python collect_fus.py -o output -u ${{secrets.FUSIONSOLAR_USER}} -p ${{secrets.FUSIONSOLAR_PASSWORD}}
+          python etl_collect_fus.py -o output -u ${{secrets.FUSIONSOLAR_USER}} -p ${{secrets.FUSIONSOLAR_PASSWORD}}
       - name: Uploads artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -44,9 +44,9 @@ jobs:
       - name: Update data
         run: |
           mkdir -p updated/fusion_solar
-          python update_std.py -p previous/fusion_solar -l latest/fusion_solar -u updated/fusion_solar
+          python etl_update.py -p previous/fusion_solar -l latest/fusion_solar -u updated/fusion_solar
           mkdir -p updated/std
-          python update_std.py -p previous/std -l latest/fusion_solar -u updated/std -r src/fus2std.json
+          python etl_update.py -p previous/std -l latest/fusion_solar -u updated/std -r src/fus2std.json
       - name: Uploads artifacts
         uses: actions/upload-artifact@v3
         with:
