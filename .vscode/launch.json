@@ -17,7 +17,7 @@
                 "-p",
                 "${env:FUSIONSOLAR_PASSWORD}",
                 "-o",
-                "latest"
+                "data/latest"
             ]
         },
         {
