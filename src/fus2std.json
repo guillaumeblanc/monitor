@@ -1,4 +1,5 @@
 {
+    "stationCode": "plant_code",
     "stationName": "plant_name",
     "stationAddr": "plant_addr",
     "collectTime": "collect_time",
