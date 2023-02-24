@@ -33,6 +33,7 @@ def description(parameter: str):
         'aidType': 'Poverty alleviation plant ID: 0: poverty alleviation plant, 1: non-poverty alleviation plant',
         'stationLinkman': 'Plant contact',
         'linkmanPho': 'Contact phone number',
+        'collectTime': 'Collection time',
         'day_power': 'Yield today (kWh)',
         'month_power': 'Yield this month (kWh)',
         'total_power': 'Total yield (kWh)',

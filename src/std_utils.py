@@ -9,7 +9,6 @@ def to_csv(data: list, path: Path):
     '''
     Dumps list of entries to csv.
     '''
-
     new = pd.DataFrame(data)
     new.fillna("", inplace=True)
     new.to_csv(path, index=False)
@@ -37,3 +36,33 @@ def format_filename(key, time: datetime.datetime):
         'yearly': 'yearly.csv'
     }
     return formats[key]
+
+
+def description(parameter: str):
+    '''
+    Gets description from column name.
+    '''
+    descriptions = {
+        "plant_code": "Plant unique code",
+        "plant_name": 'Plant name',
+        "plant_addr": 'Detailed address of the plant',
+        "collect_time": 'Collection time',
+        "capacity": 'Installed capacity (MW)',
+        "build_state": 'Plant status: 0: not constructed, 1: under construction, 2: grid-connected',
+        "health_state": 'Plant health status: 1: disconnected, 2: faulty, 3: healthy',
+        "day_power": 'Yield today (kWh)',
+        "month_power": 'Yield this month (kWh)',
+        "total_power": 'Total yield (kWh)',
+        "day_income": 'Revenue today',
+        "total_income": 'Total revenue',
+        "radiation_intensity": 'Global irradiation (kWh/m²)',
+        "theory_power": 'Theoretical yield (kWh)',
+        "inverter_power": 'Inverter yield (kWh)',
+        "ongrid_power": 'Feed-in energy',
+        "power_profit": 'Revenue',
+        "installed_capacity": 'Installed capacity kW',
+        'performance_ratio': 'Performance ratio kWh',
+        'use_power': 'Consumption (kWh)',
+        'perpower_ratio': 'Specific energy (kWh/kWp : h)'
+    }
+    return descriptions.get(parameter, 'Unknown')
