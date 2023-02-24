@@ -2,6 +2,7 @@ from pathlib import Path
 import csv
 import datetime
 import pandas as pd
+from extern.fusnic import fusnic
 
 
 def flatten(data):
@@ -9,16 +10,15 @@ def flatten(data):
     Convert list of dataItemMap to a flat list of data.
     Fixup also non standard units, like time
     '''
-    
-    def fixup_time(timestamp):
-        return datetime.datetime.fromtimestamp(timestamp / 1000.)
 
     for entry in data:
         line = entry['dataItemMap']
         line['stationCode'] = entry['stationCode']
         if entry.get('collectTime'):
-            line['collectTime'] = fixup_time(entry['collectTime'])
+            line['collectTime'] = fusnic.Client.from_timestamp(
+                entry['collectTime'])
         yield line
+
 
 def description(parameter: str):
     '''

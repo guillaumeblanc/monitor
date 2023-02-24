@@ -35,6 +35,9 @@ def collect(output: Path, username: str, password: str):
             # Hourly data
             logging.info('Querying realtime data.')
             realtime = client.get_plant_realtime_data(plants_code)
+            for entry in realtime:  # Adds time information
+                entry.update({'collectTime': client.to_timestamp(now)})
+            print(realtime)
             logging.info('- Found ' + str(len(realtime)) + ' realtime data')
             std_utils.to_csv(fus_utils.flatten(realtime), output /
                              std_utils.format_filename('realtime', now))
