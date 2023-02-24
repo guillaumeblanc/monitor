@@ -29,11 +29,11 @@
             "justMyCode": true,
             "args": [
                 "-p",
-                "previous",
+                "data/previous",
                 "-l",
-                "latest",
+                "data/latest",
                 "-u",
-                "std",
+                "data/std",
                 "-r",
                 "src/fus2std.json"
             ]
@@ -48,7 +48,7 @@
             "args": [
                 "download",
                 "-l",
-                "somedir",
+                "data/somedir",
                 "-d",
                 "${env:GDRIVE_FOLDER}",
                 "-c",
