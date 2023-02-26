@@ -12,32 +12,42 @@ from extern.fusnic import fusnic
 import src.std_utils as std_utils
 
 
-def rename(data: pd.DataFrame, rename_conf: Path):
-    if not rename_conf.is_file():
-        logging.fatal('No renaming configuration provided')
+def remap(data: pd.DataFrame, remap_conf: Path):
+    if not remap_conf.is_file():
+        logging.fatal('No remaping configuration provided')
         return data
 
     try:
-        with open(rename_conf) as f:
+        with open(remap_conf) as f:
             rdict = json.load(f)
     except:
         logging.fatal(
-            'Failed to decode json renaming configuration: %' % rename_conf)
+            'Failed to decode json remaping configuration: %' % remap_conf)
         raise
     else:
-        subset = data[[c for c in data.columns if c in rdict.keys()]]
-        return subset.rename(columns=rdict)
+        # Select columns
+        subset = data[[c for c in data.columns if c in rdict['columns'].keys()]]
+        subset = subset.rename(columns=rdict['columns'])
+
+        # Remap values
+        for col, dict in rdict['values'].items():
+            if col in subset:
+                dict = {int(k) if k.isdigit() else k: v for k,
+                        v in dict.items()}
+                subset = subset.replace({col: dict})
+
+        return subset
 
 
-def update(previous: Path, latest: Path, updated: Path, rename_conf: Path):
+def update(previous: Path, latest: Path, updated: Path, remap_conf: Path):
     '''
     Update (ie add new rows) all files based on their name.
-    Latest column names can be changed with "rename" configuration dict
+    Latest column names can be changed with "remap" configuration dict
     '''
     for lfile in latest.glob('*.csv'):
         try:
             ldata = std_utils.from_csv(lfile)
-            udata = ldata = rename(ldata, rename_conf)
+            udata = ldata = remap(ldata, remap_conf)
 
         except pd.errors.EmptyDataError:
             logging.info(

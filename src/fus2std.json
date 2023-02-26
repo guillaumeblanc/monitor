@@ -1,23 +1,31 @@
 {
-    "stationCode": "plant_code",
-    "stationName": "plant_name",
-    "stationAddr": "plant_addr",
-    "collectTime": "collect_time",
-    "capacity": "capacity",
-    "buildState": "build_state",
-    "real_health_state": "health_state",
-    "day_power": "day_power",
-    "month_power": "month_power",
-    "total_power": "total_power",
-    "day_income": "day_income",
-    "total_income": "total_income",
-    "radiation_intensity": "radiation_intensity",
-    "theory_power": "theory_power",
-    "inverter_power": "inverter_power",
-    "ongrid_power": "ongrid_power",
-    "power_profit": "power_profit",
-    "installed_capacity": "installed_capacity",
-    "performance_ratio": "performance_ratio",
-    "use_power": "use_power",
-    "perpower_ratio": "perpower_ratio"
+    "columns": {
+        "stationCode": "plant_code",
+        "stationName": "plant_name",
+        "stationAddr": "plant_addr",
+        "collectTime": "collect_time",
+        "capacity": "capacity",
+        "real_health_state": "health_state",
+        "day_power": "day_power",
+        "month_power": "month_power",
+        "total_power": "total_power",
+        "day_income": "day_income",
+        "total_income": "total_income",
+        "radiation_intensity": "radiation_intensity",
+        "theory_power": "theory_power",
+        "inverter_power": "inverter_power",
+        "ongrid_power": "ongrid_power",
+        "power_profit": "power_profit",
+        "installed_capacity": "installed_capacity",
+        "performance_ratio": "performance_ratio",
+        "use_power": "use_power",
+        "perpower_ratio": "perpower_ratio"
+    },
+    "values": {
+        "health_state": {
+            "1": "Disconnected",
+            "2": "Faulty",
+            "3": "Healthy"
+        }
+    }
 }

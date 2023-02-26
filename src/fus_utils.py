@@ -14,17 +14,21 @@ def flatten(data):
     for entry in data:
         line = entry['dataItemMap']
         line['stationCode'] = entry['stationCode']
+
+        # Fix up time
         if entry.get('collectTime'):
             line['collectTime'] = fusnic.Client.from_timestamp(
                 entry['collectTime'])
+
         yield line
 
 
-def description(parameter: str):
+def descriptions():
     '''
-    Gets description from column name.
+    Gets a dict mapping column name to its description.
     '''
-    descriptions = {
+    return {
+        'plant_code': 'Plant unique code',
         'stationName': 'Plant name',
         'stationAddr': 'Detailed address of the plant',
         'capacity': 'Installed capacity (MW)',
@@ -53,4 +57,10 @@ def description(parameter: str):
         'reduction_total_coal': 'Standard coal saved (Ton)',
         'reduction_total_tree': 'Equivalent trees planted',
     }
-    return descriptions.get(parameter, 'Unknown')
+
+
+def description(parameter: str):
+    '''
+    Gets description from column name.
+    '''
+    return descriptions().get(parameter, 'Unknown')
