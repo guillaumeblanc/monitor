@@ -45,6 +45,7 @@ def update(previous: Path, latest: Path, updated: Path, remap_conf: Path):
     Latest column names can be changed with "remap" configuration dict
     '''
     for lfile in latest.glob('**/*.csv'):
+        logging.info('Processing latest file: %s' % lfile)
         try:
             ldata = std_utils.from_csv(lfile)
             udata = ldata = remap(ldata, remap_conf)

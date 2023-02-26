@@ -32,10 +32,9 @@ jobs:
           local_folder: 'data'
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
-  Update:
+  Merge:
     needs: FusionSolar
     runs-on: ubuntu-latest
-    if: false
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -46,28 +45,22 @@ jobs:
       - name: Download from Google Drive
         uses: ./.github/actions/gdrive_download
         with:
-          local_folder: 'data/previous'
+          local_folder: 'data'
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
-      - name: Download latest artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: fusion_solar
-          path: data/latest/fusion_solar
-      - name: Update data
+      - name: Merge data
         run: |
-          mkdir -p data/updated/fusion_solar
-          python etl_update.py -p data/previous/fusion_solar -l data/latest/fusion_solar -u data/updated/fusion_solar
-          mkdir -p data/updated/std
-          python etl_update.py -p data/previous/std -l data/latest/fusion_solar -u data/updated/std -r src/fus2std.json
+          mkdir -p data/updated/merged
+          python etl_update.py -p data/std/merged -l data/std/fusion_solar -u data/updated/merged
       - name: Uploads artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: updated-data
-          path: data/updated
+          name: merged
+          path: data/updated/merged
       - name: Upload to Google Drive
         uses: ./.github/actions/gdrive_upload
         with:
-          local_folder: 'data/updated'
+          local_folder: 'data/updated/merged'
+          gdrive_subfolder: 'std/merged'
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
