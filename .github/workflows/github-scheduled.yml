@@ -4,7 +4,7 @@ on:
   #schedule:
   #  - cron: '*/15 6-22 * * *'
 jobs:
-  FusionSolar_Collect:
+  FusionSolar:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -15,16 +15,27 @@ jobs:
         uses: ./extern/fusnic/.github/actions/setup_python
       - name: Collect data
         run: |
-          mkdir -p data/output
-          python etl_collect_fus.py -o data/output -u ${{secrets.FUSIONSOLAR_USER}} -p ${{secrets.FUSIONSOLAR_PASSWORD}}
+          mkdir -p data/raw/fusion_solar
+          python etl_collect_fus.py -o data/raw/fusion_solar -u ${{secrets.FUSIONSOLAR_USER}} -p ${{secrets.FUSIONSOLAR_PASSWORD}}
+      - name: Standardize data
+        run: |
+          mkdir -p data/std/fusion_solar
+          python etl_update.py -l data/raw/fusion_solar -u data/std/fusion_solar -r src/fus2std.json
       - name: Uploads artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: fus_collected-data
-          path: data/output
-  FusionSolar_Update:
-    needs: FusionSolar_Collect
+          name: fusion_solar
+          path: data
+      - name: Upload to Google Drive
+        uses: ./.github/actions/gdrive_upload
+        with:
+          local_folder: 'data'
+          gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
+          gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
+  Update:
+    needs: FusionSolar
     runs-on: ubuntu-latest
+    if: false
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -41,7 +52,7 @@ jobs:
       - name: Download latest artifacts
         uses: actions/download-artifact@v3
         with:
-          name: fus_collected-data
+          name: fusion_solar
           path: data/latest/fusion_solar
       - name: Update data
         run: |

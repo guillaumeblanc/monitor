@@ -5,7 +5,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 from extern.fusnic import fusnic
-# from extern.fusnic.fusnic.tests.mock_session import MockSession
+from extern.fusnic.fusnic.tests.mock_session import MockSession
 
 import src.std_utils as std_utils
 import src.fus_utils as fus_utils
@@ -18,8 +18,8 @@ def collect(output: Path, username: str, password: str):
     now = datetime.now(tz=timezone.utc)
 
     try:
-        with fusnic.ClientSession(user=username, password=password) as client:
-            # with fusnic.Client(session=MockSession()) as client:
+        # with fusnic.ClientSession(user=username, password=password) as client:
+        with fusnic.Client(session=MockSession()) as client:
 
             logging.info('Querying plants list.')
             plants = client.get_plant_list()

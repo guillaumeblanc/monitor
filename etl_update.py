@@ -44,7 +44,7 @@ def update(previous: Path, latest: Path, updated: Path, remap_conf: Path):
     Update (ie add new rows) all files based on their name.
     Latest column names can be changed with "remap" configuration dict
     '''
-    for lfile in latest.glob('*.csv'):
+    for lfile in latest.glob('**/*.csv'):
         try:
             ldata = std_utils.from_csv(lfile)
             udata = ldata = remap(ldata, remap_conf)
@@ -65,14 +65,14 @@ def update(previous: Path, latest: Path, updated: Path, remap_conf: Path):
                 # Updates with new lines (only)
                 udata = pd.concat([ldata, pdata]).drop_duplicates()
 
-            ufile = updated / lfile.name
+            ufile = updated / lfile.relative_to(latest)
             logging.info('Updating file: %s' % ufile)
             std_utils.to_csv(udata, ufile)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--previous', required=True,
+    parser.add_argument('-p', '--previous', required=False, default='none',
                         help='Previous data')
     parser.add_argument('-l', '--latest', required=True,
                         help='Latest data')

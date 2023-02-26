@@ -28,8 +28,8 @@
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                "-p",
-                "data/previous",
+                //                "-p",
+                //                "data/previous",
                 "-l",
                 "data/latest",
                 "-u",

@@ -38,15 +38,16 @@ def from_csvs(path: Path, pattern: str):
 
 
 def format_filename(key, time: datetime.datetime):
+    root = time.strftime('%Y') + '/'
     formats = {
-        'plants': 'plants.csv',
-        'realtime': 'realtime_' + time.strftime('%Y') + '.csv',
-        'hourly': 'hourly_' + time.strftime('%Y-%m') + '.csv',
-        'daily': 'daily_' + time.strftime('%Y') + '.csv',
-        'monthly': 'monthly.csv',
-        'yearly': 'yearly.csv'
+        'plants': root + 'plants_' + time.strftime('%Y-%m-%d') + '.csv',
+        'realtime': root + 'realtime_' + time.strftime('%Y-%m-%d') + '.csv',
+        'hourly': root + 'hourly_' + time.strftime('%Y-%m-%d') + '.csv',
+        'daily': root + 'daily_' + time.strftime('%Y-%m') + '.csv',
+        'monthly': root + 'monthly.csv',
+        'yearly': root + 'yearly.csv',
     }
-    return formats[key]
+    return Path(formats[key])
 
 
 def descriptions():
