@@ -32,7 +32,7 @@ jobs:
           local_folder: 'data'
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
-  Merge:
+  Aggregate:
     needs: FusionSolar
     runs-on: ubuntu-latest
     steps:
@@ -49,19 +49,19 @@ jobs:
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
           gdrive_subfolder: 'std'
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
-      - name: Merge FusionSolar data
+      - name: Aggregate FusionSolar data
         run: |
-          mkdir -p data/std/updated
-          python etl_update.py -p data/std/merged -l data/std/fusion_solar -u data/std/updated
+          mkdir -p data/aggregated
+          python etl_update.py -p data/std/aggregated -l data/std/fusion_solar -u data/aggregated
       - name: Uploads artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: merged
-          path: data/std/updated
+          name: aggregated
+          path: data/aggregated
       - name: Upload to Google Drive
         uses: ./.github/actions/gdrive_upload
         with:
-          local_folder: 'data/std/updated'
-          gdrive_subfolder: 'std/merged'
+          local_folder: 'data/aggregated'
+          gdrive_subfolder: 'aggregated'
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
