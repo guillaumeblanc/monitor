@@ -45,22 +45,23 @@ jobs:
       - name: Download from Google Drive
         uses: ./.github/actions/gdrive_download
         with:
-          local_folder: 'data'
+          local_folder: 'data/std'
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
+          gdrive_subfolder: 'std'
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
-      - name: Merge data
+      - name: Merge FusionSolar data
         run: |
-          mkdir -p data/updated/merged
-          python etl_update.py -p data/std/merged -l data/std/fusion_solar -u data/updated/merged
+          mkdir -p data/std/updated
+          python etl_update.py -p data/std/merged -l data/std/fusion_solar -u data/std/updated
       - name: Uploads artifacts
         uses: actions/upload-artifact@v3
         with:
           name: merged
-          path: data/updated/merged
+          path: data/std/updated
       - name: Upload to Google Drive
         uses: ./.github/actions/gdrive_upload
         with:
-          local_folder: 'data/updated/merged'
+          local_folder: 'data/std/updated'
           gdrive_subfolder: 'std/merged'
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
