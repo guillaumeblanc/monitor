@@ -14,7 +14,7 @@ import src.std_utils as std_utils
 
 def remap(data: pd.DataFrame, remap_conf: Path):
     if not remap_conf.is_file():
-        logging.fatal('No remaping configuration provided')
+        logging.info('No remaping configuration provided')
         return data
 
     try:
@@ -55,7 +55,7 @@ def update(previous: Path, latest: Path, updated: Path, remap_conf: Path):
                 'Empty data for latest file: %s. Skipping update.' % lfile)
             pass
         else:
-            pfile = previous / lfile.name
+            pfile = previous / lfile.relative_to(latest)
             try:
                 pdata = std_utils.from_csv(pfile)
             except (pd.errors.EmptyDataError, FileNotFoundError):

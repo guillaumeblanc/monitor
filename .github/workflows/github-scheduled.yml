@@ -45,14 +45,19 @@ jobs:
       - name: Download from Google Drive
         uses: ./.github/actions/gdrive_download
         with:
-          local_folder: 'data/std'
+          local_folder: 'data/previous'
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
-          gdrive_subfolder: 'std'
+          gdrive_subfolder: 'aggregated'
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
+      - name: Downloads artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: fusion_solar
+          path: data
       - name: Aggregate FusionSolar data
         run: |
-          mkdir -p data/aggregated
-          python etl_update.py -p data/std/aggregated -l data/std/fusion_solar -u data/aggregated
+          mkdir -p data/updated
+          python etl_update.py -p data/previous -l data/std/fusion_solar -u data/aggregated
       - name: Uploads artifacts
         uses: actions/upload-artifact@v3
         with:
