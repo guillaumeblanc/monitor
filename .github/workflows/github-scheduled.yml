@@ -48,6 +48,7 @@ jobs:
           local_folder: 'data/previous'
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
           gdrive_subfolder: 'aggregated'
+          match: '2023/*'
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
       - name: Downloads artifacts
         uses: actions/download-artifact@v3

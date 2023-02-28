@@ -63,6 +63,9 @@ def update(previous: Path, latest: Path, updated: Path, remap_conf: Path):
                     'No/empty data for previous file: %s. Using latest.' % pfile)
                 pass
             else:
+                logging.info(
+                    'Found data for previous file: %s. Merging.' % pfile)
+
                 # Updates with new lines (only)
                 udata = pd.concat([ldata, pdata]).drop_duplicates()
 

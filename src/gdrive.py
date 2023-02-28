@@ -33,11 +33,11 @@ class GoogleDriveClient(GoogleDrive):
                 yield file
 
     @staticmethod
-    def _build_local_tree(path: Path, match:str):
+    def _build_local_tree(path: Path, match: str):
         for p in path.rglob(match):
             yield PurePath.relative_to(p, path)
 
-    def _build_remote_tree(self, id: str, match:str):
+    def _build_remote_tree(self, id: str, match: str):
         file = self.CreateFile({'id': id})
         file.FetchMetadata()
 
@@ -59,8 +59,7 @@ class GoogleDriveClient(GoogleDrive):
         subtree = {k: v for k, v in tree.items() if k.match(match)}
         return subtree
 
-
-    def download(self, local: Path, remote_id: str, remote_subfolder: Path, match:str):
+    def download(self, local: Path, remote_id: str, remote_subfolder: Path, match: str):
         if not local.exists():
             raise ValueError('Destination path %s does not exist' % str(local))
         if not local.is_dir():
@@ -76,12 +75,11 @@ class GoogleDriveClient(GoogleDrive):
         filtered_subtree = {k.relative_to(remote_subfolder): v for k, v in remote_tree.items(
         ) if k.is_relative_to(remote_subfolder)}
         if not filtered_subtree:
-            logging.info('No file found for subfolder %s', str(remote_subfolder))
+            logging.info('No file found for subfolder %s',
+                         str(remote_subfolder))
 
         # Download filtered tree
         for path, file in sorted(filtered_subtree.items()):
-
-
             this_path = local / path
 
             if self.is_folder(file):
@@ -91,9 +89,10 @@ class GoogleDriveClient(GoogleDrive):
             else:
                 logging.info('Downloading file: %s, id: %s, mine: %s' % (
                     path, file['id'], file['mimeType']))
+                this_path.parent.mkdir(parents=True, exist_ok=True)
                 file.GetContentFile(this_path)
 
-    def upload(self, local: Path, remote_id: str, remote_subfolder: Path, match:str):
+    def upload(self, local: Path, remote_id: str, remote_subfolder: Path, match: str):
         if not local.exists():
             raise ValueError('Source path %s does not exist' % str(local))
         if not local.is_dir():
@@ -183,4 +182,5 @@ if __name__ == '__main__':
     auth = authenticate(key)
     with GoogleDriveClient(auth) as drive:
         to_call = drive.download if args.direction == 'download' else drive.upload
-        to_call(Path(args.local), args.drive, Path(args.drive_subfolder), args.match)
+        to_call(Path(args.local), args.drive, Path(
+            args.drive_subfolder), args.match)
