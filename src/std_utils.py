@@ -45,7 +45,7 @@ def format_filename(key, time: datetime.datetime):
         'hourly': year + 'hourly_' + time.strftime('%Y-%m-%d') + '.csv',
         'daily': year + 'daily_' + time.strftime('%Y-%m') + '.csv',
         'monthly': year + 'monthly_' + time.strftime('%Y') + '.csv',
-        'yearly': 'yearly.csv',
+        'yearly': year + 'yearly_' + time.strftime('%Y') + '.csv'
     }
     return Path(formats[key])
 
