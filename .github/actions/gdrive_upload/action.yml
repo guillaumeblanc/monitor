@@ -11,6 +11,10 @@ inputs:
     description: 'GDrive subfolder'
     required: false
     default: '.'
+  match:
+    description: 'Match pattern'
+    required: false
+    default: '\*'
   gdrive_credentials:
     description: 'Google Drive base64 credentials'
     required: true
@@ -21,4 +25,4 @@ runs:
       shell: bash
       run: |
           mkdir -p ${{inputs.local_folder}}
-          python ./src/gdrive.py upload -l ${{inputs.local_folder}} -d ${{inputs.gdrive_folder_id}} -s ${{inputs.gdrive_subfolder}} -c ${{inputs.gdrive_credentials}}
+          python ./src/gdrive.py upload -l ${{inputs.local_folder}} -d ${{inputs.gdrive_folder_id}} -s ${{inputs.gdrive_subfolder}} -m ${{inputs.match}} -c ${{inputs.gdrive_credentials}}

@@ -33,14 +33,15 @@ class GoogleDriveClient(GoogleDrive):
                 yield file
 
     @staticmethod
-    def _build_local_tree(path: Path):
-        for p in path.rglob("*"):
+    def _build_local_tree(path: Path, match:str):
+        for p in path.rglob(match):
             yield PurePath.relative_to(p, path)
 
-    def _build_remote_tree(self, id: str):
+    def _build_remote_tree(self, id: str, match:str):
         file = self.CreateFile({'id': id})
         file.FetchMetadata()
 
+        tree = {}
         if self.is_folder(file):
             def recurse(file, path: Path):
                 this_path = path / file['title']
@@ -49,12 +50,17 @@ class GoogleDriveClient(GoogleDrive):
                     for inner in self.list_folder(file['id']):
                         yield from recurse(inner, this_path)
 
-            return {path: f for inner in self.list_folder(file['id'])
+            tree = {path: f for inner in self.list_folder(file['id'])
                     for (path, f) in recurse(inner, Path())}
         else:
-            return {Path(file['title']): file}
+            tree = {Path(file['title']): file}
 
-    def download(self, local: Path, remote_id: str, remote_subfolder: Path):
+        # Filters for match pattern
+        subtree = {k: v for k, v in tree.items() if k.match(match)}
+        return subtree
+
+
+    def download(self, local: Path, remote_id: str, remote_subfolder: Path, match:str):
         if not local.exists():
             raise ValueError('Destination path %s does not exist' % str(local))
         if not local.is_dir():
@@ -64,18 +70,20 @@ class GoogleDriveClient(GoogleDrive):
             raise ValueError('Source id %s must be a folder' % str(remote_id))
 
         # Build remote tree of files / folder
-        remote_tree = self._build_remote_tree(remote_id)
+        remote_tree = self._build_remote_tree(remote_id, match)
 
         # Filters for the requested subfolder
         filtered_subtree = {k.relative_to(remote_subfolder): v for k, v in remote_tree.items(
         ) if k.is_relative_to(remote_subfolder)}
         if not filtered_subtree:
-            logging.info('No file found for subfolder %s',
-                         str(remote_subfolder))
+            logging.info('No file found for subfolder %s', str(remote_subfolder))
 
         # Download filtered tree
         for path, file in sorted(filtered_subtree.items()):
+
+
             this_path = local / path
+
             if self.is_folder(file):
                 logging.info('Creating folder: %s, id: %s' %
                              (path, file['id']))
@@ -85,7 +93,7 @@ class GoogleDriveClient(GoogleDrive):
                     path, file['id'], file['mimeType']))
                 file.GetContentFile(this_path)
 
-    def upload(self, local: Path, remote_id: str, remote_subfolder: Path):
+    def upload(self, local: Path, remote_id: str, remote_subfolder: Path, match:str):
         if not local.exists():
             raise ValueError('Source path %s does not exist' % str(local))
         if not local.is_dir():
@@ -95,8 +103,9 @@ class GoogleDriveClient(GoogleDrive):
                 'Destination id %s must be a folder' % str(remote_id))
 
         # Gather local data and remote data
-        local_tree = self._build_local_tree(local)
-        remote_tree = self._build_remote_tree(remote_id)
+        logging.info('Globing local path: %s.' % (local))
+        local_tree = self._build_local_tree(local, match)
+        remote_tree = self._build_remote_tree(remote_id, '*')
 
         def _create_file(path, is_dir):
             logging.info('Creating %s: %s' %
@@ -160,6 +169,8 @@ if __name__ == '__main__':
                         help='Drive directory id.', required=True)
     parser.add_argument('-s', '--drive_subfolder', default='.',
                         help='Drive subfolder path.')
+    parser.add_argument('-m', '--match', default='*',
+                        help='Match paths against the provided pattern.')
     parser.add_argument('-c', '--credentials', default='',
                         help='Google Service Account credentials as base64 string.', required=True)
     parser.add_argument('-ll', '--loglevel', default='info',
@@ -172,4 +183,4 @@ if __name__ == '__main__':
     auth = authenticate(key)
     with GoogleDriveClient(auth) as drive:
         to_call = drive.download if args.direction == 'download' else drive.upload
-        to_call(Path(args.local), args.drive, Path(args.drive_subfolder))
+        to_call(Path(args.local), args.drive, Path(args.drive_subfolder), args.match)
