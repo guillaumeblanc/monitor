@@ -1,6 +1,7 @@
 import logging
 import sys
 import argparse
+import pandas as pd
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -26,7 +27,7 @@ def collect(output: Path, username: str, password: str):
             logging.info('- Found ' + str(len(plants)) + ' plants:')
             [logging.info(' - ' + plant['stationName'] +
                           ' (' + plant['stationCode'] + ')') for plant in plants]
-            std_utils.to_csv(plants, output /
+            std_utils.to_csv(pd.DataFrame(plants), output /
                              std_utils.format_filename('plants', now))
 
             # Extract the list of plants code

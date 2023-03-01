@@ -20,7 +20,7 @@ jobs:
       - name: Standardize data
         run: |
           mkdir -p data/std/fusion_solar
-          python etl_update.py -l data/raw/fusion_solar -u data/std/fusion_solar -r src/fus2std.json
+          python etl_standardize.py -s data/raw/fusion_solar -d data/std/fusion_solar -c src/fus2std.json
       - name: Uploads artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -45,29 +45,23 @@ jobs:
       - name: Download from Google Drive
         uses: ./.github/actions/gdrive_download
         with:
-          local_folder: 'data/previous'
+          local_folder: 'data/std'
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
-          gdrive_subfolder: 'aggregated'
-          match: '2023/*'
+          gdrive_subfolder: 'std'
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
-      - name: Downloads artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: fusion_solar
-          path: data
-      - name: Aggregate FusionSolar data
+      - name: Aggregate data
         run: |
-          mkdir -p data/updated
-          python etl_update.py -p data/previous -l data/std/fusion_solar -u data/aggregated
+          mkdir -p data/agg
+          python etl_aggregate.py -s data/std -d data/agg
       - name: Uploads artifacts
         uses: actions/upload-artifact@v3
         with:
           name: aggregated
-          path: data/aggregated
+          path: data/agg
       - name: Upload to Google Drive
         uses: ./.github/actions/gdrive_upload
         with:
-          local_folder: 'data/aggregated'
-          gdrive_subfolder: 'aggregated'
+          local_folder: 'data/agg'
+          gdrive_subfolder: 'agg'
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}

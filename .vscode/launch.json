@@ -21,21 +21,33 @@
             ]
         },
         {
-            "name": "Python: Update Fusion Solar data",
+            "name": "Python: Standardize data",
             "type": "python",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
             "args": [
-                //                "-p",
-                //                "data/previous",
-                "-l",
+                "-s",
                 "data/latest",
-                "-u",
+                "-d",
                 "data/std",
-                "-r",
+                "-c",
                 "src/fus2std.json"
+            ]
+        },
+        {
+            "name": "Python: Aggregate data",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "-s",
+                "data/std",
+                "-d",
+                "data/agg"
             ]
         },
         {

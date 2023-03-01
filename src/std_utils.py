@@ -5,15 +5,14 @@ import datetime
 import pandas as pd
 
 
-def to_csv(data: list, path: Path):
+def to_csv(data: pd.DataFrame, path: Path):
     '''
     Dumps list of entries to csv.
     '''
     path.parent.mkdir(parents=True, exist_ok=True)
 
-    new = pd.DataFrame(data)
-    new.fillna('', inplace=True)
-    new.to_csv(path, index=False)
+    data.fillna('', inplace=True)
+    data.to_csv(path, index=False)
 
 
 def from_csv(path: Path):
@@ -33,8 +32,17 @@ def from_csvs(path: Path, pattern: str):
     '''
     Returns a list (generator) of dataframe loaded from all csv files that matches the pattern.
     '''
+    aggregated = pd.DataFrame()
     for filename in path.glob(pattern):
-        yield from_csv(filename)
+        aggregated = pd.concat([aggregated, from_csv(filename)])
+
+    aggregated.drop_duplicates(inplace=True)
+
+    return aggregated
+
+
+def file_patterns():
+    return ['plants', 'realtime', 'hourly', 'daily', 'monthly', 'yearly']
 
 
 def format_filename(key, time: datetime.datetime):

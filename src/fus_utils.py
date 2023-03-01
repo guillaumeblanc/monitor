@@ -10,17 +10,19 @@ def flatten(data):
     Convert list of dataItemMap to a flat list of data.
     Fixup also non standard units, like time
     '''
+    def iterate(data):
+        for entry in data:
+            line = entry['dataItemMap']
+            line['stationCode'] = entry['stationCode']
 
-    for entry in data:
-        line = entry['dataItemMap']
-        line['stationCode'] = entry['stationCode']
+            # Fix up time
+            if entry.get('collectTime'):
+                line['collectTime'] = fusnic.Client.from_timestamp(
+                    entry['collectTime'])
 
-        # Fix up time
-        if entry.get('collectTime'):
-            line['collectTime'] = fusnic.Client.from_timestamp(
-                entry['collectTime'])
+            yield line
 
-        yield line
+    return pd.DataFrame(iterate(data))
 
 
 def descriptions():
