@@ -61,15 +61,13 @@
             "args": [
                 "download",
                 "-l",
-                "data/previous",
+                "data/latest",
                 "-d",
                 "${env:GDRIVE_FOLDER}",
                 "-s",
-                "aggregated",
+                "raw",
                 "-c",
-                "${env:GDRIVE_CREDENTIALS}",
-                "-m",
-                "*/monthly*"
+                "${env:GDRIVE_CREDENTIALS}"
             ]
         }
     ]
