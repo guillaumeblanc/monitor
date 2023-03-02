@@ -16,7 +16,7 @@ jobs:
       - name: Collect data
         run: |
           mkdir -p data/raw/fusion_solar
-          python etl_collect_fus.py -o data/raw/fusion_solar -u ${{secrets.FUSIONSOLAR_USER}} -p ${{secrets.FUSIONSOLAR_PASSWORD}}
+          python etl_collect_fus.py -o data/raw/fusion_solar -u ${{secrets.FUSIONSOLAR_USER}} -p ${{secrets.FUSIONSOLAR_PASSWORD}} --mock
       - name: Standardize data
         run: |
           mkdir -p data/std/fusion_solar
