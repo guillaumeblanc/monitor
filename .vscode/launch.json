@@ -17,7 +17,8 @@
                 "-p",
                 "${env:FUSIONSOLAR_PASSWORD}",
                 "-o",
-                "data/latest"
+                "data/raw",
+                "--mock"
             ]
         },
         {
@@ -29,7 +30,7 @@
             "justMyCode": true,
             "args": [
                 "-s",
-                "data/latest",
+                "data/raw",
                 "-d",
                 "data/std",
                 "-c",

@@ -16,15 +16,8 @@ def to_csv(data: pd.DataFrame, path: Path):
 
 
 def from_csv(path: Path):
-    def categories(df: pd.DataFrame):
-        cats = ['plant_code', 'plant_name', 'build_state', 'health_state']
-        for col in df.columns:
-            if col in cats:
-                df[col] = pd.Categorical(df[col])
-        return df
 
     df = pd.read_csv(str(path))
-    df = categories(df)
     return df
 
 
@@ -40,6 +33,12 @@ def from_csvs(path: Path, pattern: str):
 
     return aggregated
 
+def categories(df: pd.DataFrame):
+    cats = ['plant_code', 'plant_name', 'build_state', 'health_state']
+    for col in df.columns:
+        if col in cats:
+            df[col] = pd.Categorical(df[col])
+    return df
 
 def file_patterns():
     return ['plants', 'realtime', 'hourly', 'daily', 'monthly', 'yearly']

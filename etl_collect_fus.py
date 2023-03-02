@@ -12,15 +12,14 @@ import src.std_utils as std_utils
 import src.fus_utils as fus_utils
 
 
-def collect(output: Path, username: str, password: str):
+def collect(output: Path, username: str, password: str, mock: bool):
     '''
     Query all plants data from Fusion Solar Northbound interface.
     '''
     now = datetime.now(tz=timezone.utc)
 
     try:
-        # with fusnic.ClientSession(user=username, password=password) as client:
-        with fusnic.Client(session=MockSession()) as client:
+        with fusnic.Client(session=MockSession() if mock else fusnic.Session(user=username, password=password)) as client:
 
             logging.info('Querying plants list.')
             plants = client.get_plant_list()
@@ -86,13 +85,14 @@ if __name__ == '__main__':
                         help='FusionSolar Northbound interface user name')
     parser.add_argument('-p', '--password', required=True,
                         help='FusionSolar Northbound interface password')
-    parser.add_argument('-ll', '--loglevel', default='info',
-                        help='Logging level. Example --loglevel debug, default=info')
     parser.add_argument('-o', '--output', default='out',
                         help='Output directory. Example --output your_path, default=out')
+    parser.add_argument('-m', '--mock', default=False, action=argparse.BooleanOptionalAction,
+                        help='Mock fusion solar data')
+    parser.add_argument('-ll', '--loglevel', default='info',
+                        help='Logging level. Example --loglevel debug, default=info')
     args = parser.parse_args()
 
     logging.basicConfig(level=args.loglevel.upper())
 
-    collect(output=Path(args.output),
-            username=args.username, password=args.password)
+    collect(output=Path(args.output), username=args.username, password=args.password, mock=args.mock)
