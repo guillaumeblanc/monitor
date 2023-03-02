@@ -80,29 +80,25 @@ class GoogleDriveClient(GoogleDrive):
                          str(remote_subfolder))
 
         # Download filtered tree
-        async_tasks = []
-        for path, file in sorted(filtered_subtree.items()):
-            this_path = local / path
-            if self.is_folder(file):
-                logging.info('Creating folder: %s, id: %s' %
-                             (path, file['id']))
-                this_path.mkdir(parents=True, exist_ok=True)
-            else:
-                this_path.parent.mkdir(parents=True, exist_ok=True)
-                async_tasks.append((file, this_path))
-
-        # Asynchronously run download
         event_loop = asyncio.get_event_loop()
 
-        async def async_drive():
+        async def async_download():
             futures = []
-            for (file, path) in async_tasks:
-                logging.info('Downloading file: %s, id: %s, mine: %s' % (
-                    path, file['id'], file['mimeType']))
-                futures.append(event_loop.run_in_executor(
-                    None, file.GetContentFile, path))
-            [await future for future in futures]
-        event_loop.run_until_complete(async_drive())
+            for path, file in sorted(filtered_subtree.items()):
+                this_path = local / path
+                if self.is_folder(file):
+                    logging.info('Creating folder: %s, id: %s' %
+                                 (path, file['id']))
+                    this_path.mkdir(parents=True, exist_ok=True)
+                else:
+                    this_path.parent.mkdir(parents=True, exist_ok=True)
+                    logging.info('Downloading file: %s, id: %s, mine: %s' % (
+                        path, file['id'], file['mimeType']))
+                    futures.append(event_loop.run_in_executor(
+                        None, file.GetContentFile, this_path))
+            [await f for f in futures]
+
+        event_loop.run_until_complete(async_download())
 
     def upload(self, local: Path, remote_id: str, remote_subfolder: Path, match: str):
         if not local.exists():
@@ -140,32 +136,31 @@ class GoogleDriveClient(GoogleDrive):
                 remote_tree[path] = _create_file(path, True)
 
         # Upload local tree
-        async_tasks = []
-        for path in sorted(local_tree):
-            local_path = local / path
-            is_dir = local_path.is_dir()
-
-            remote_path = remote_subfolder / path
-            file = remote_tree.get(remote_path, None)
-            if not file:
-                file = remote_tree[remote_path] = _create_file(
-                    remote_path, is_dir)
-
-            if not is_dir:
-                file.SetContentFile(str(local_path))
-                async_tasks.append((file, path))
-
-        # Asynchronously run uploads
         event_loop = asyncio.get_event_loop()
 
-        async def async_drive():
+        async def async_upload():
             futures = []
-            for (file, path) in async_tasks:
-                logging.info('Uploading file: %s, id: %s, mine: %s' % (
-                    str(path), file['id'], file['mimeType']))
-                futures.append(event_loop.run_in_executor(None, file.Upload))
-            [await future for future in futures]
-        event_loop.run_until_complete(async_drive())
+            for path in sorted(local_tree):
+                local_path = local / path
+                is_dir = local_path.is_dir()
+
+                remote_path = remote_subfolder / path
+                file = remote_tree.get(remote_path, None)
+                if not file:
+                    file = remote_tree[remote_path] = _create_file(
+                        remote_path, is_dir)
+
+                if not is_dir:
+                    logging.info('Uploading file: %s, id: %s, mine: %s' % (
+                        str(path), file['id'], file['mimeType']))
+                    file.SetContentFile(str(local_path))
+                    futures.append(
+                        event_loop.run_in_executor(None, file.Upload))
+
+            # Await completion
+            [await f for f in futures]
+
+        event_loop.run_until_complete(async_upload())
 
 
 def authenticate(key):
