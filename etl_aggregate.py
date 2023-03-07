@@ -21,7 +21,9 @@ def aggregate(source: Path, destination: Path):
         if aggregated.empty:
             logging.info('No data for pattern: %s.' % search_pattern)
             continue
-        aggregated.sort_values(by=['collect_time', 'plant_code'], inplace=True)
+        by = (['collect_time']
+              if 'collect_time' in aggregated else []) + ['plant_code']
+        aggregated.sort_values(by=by, inplace=True)
 
         dfile = destination / (pattern + '.csv')
         logging.info('Outputting file: %s.' % dfile)
