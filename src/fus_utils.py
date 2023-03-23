@@ -30,9 +30,12 @@ def descriptions():
     Gets a dict mapping column name to its description.
     '''
     return {
-        'plant_code': 'Plant unique code',
-        'stationName': 'Plant name',
-        'stationAddr': 'Detailed address of the plant',
+        'plantCode': 'Plant unique code',
+        'stationCode': 'Plant unique code',
+        'plantName': 'Plant name',
+        'plantAddress': 'Detailed address of the plant',
+        'longitude': 'Plant longitude',
+        'latitude': 'Plant latitude',
         'capacity': 'Installed capacity (MW)',
         'buildState': 'Plant status: 0: not constructed, 1: under construction, 2: grid-connected',
         'combineType': 'Grid connection type: 1: utility, 2: commercial & industrial, 3: residential',

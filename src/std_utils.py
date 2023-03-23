@@ -30,15 +30,26 @@ def from_csvs(path: Path, pattern: str):
         aggregated = pd.concat([aggregated, from_csv(filename)])
 
     aggregated.drop_duplicates(inplace=True)
+    aggregated = typify(aggregated)
 
     return aggregated
 
-def categories(df: pd.DataFrame):
+
+def typify(df: pd.DataFrame):
+    # Categories
     cats = ['plant_code', 'plant_name', 'build_state', 'health_state']
     for col in df.columns:
         if col in cats:
             df[col] = pd.Categorical(df[col])
+
+    # Date
+    dates = ['collect_time']
+    for col in df.columns:
+        if col in dates:
+            df[col] = pd.to_datetime(df[col])
+
     return df
+
 
 def file_patterns():
     return ['plants', 'realtime', 'hourly', 'daily', 'monthly', 'yearly']
@@ -65,6 +76,8 @@ def descriptions():
         'plant_code': 'Plant unique code',
         'plant_name': 'Plant name',
         'plant_addr': 'Detailed address of the plant',
+        'longitude': 'Plant longitude',
+        'latitude': 'Plant latitude',
         'collect_time': 'Collection time',
         'capacity': 'Installed capacity (MW)',
         'health_state': 'Plant health status',
@@ -90,3 +103,7 @@ def description(parameter: str):
     Gets description from column name.
     '''
     return descriptions().get(parameter, 'Unknown')
+
+
+def health_state_colormap():
+    return {'Healthy': 'green', 'Disconnected': 'orange', 'Faulty': 'red'}

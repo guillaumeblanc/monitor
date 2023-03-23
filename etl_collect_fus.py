@@ -24,13 +24,13 @@ def collect(output: Path, username: str, password: str, mock: bool):
             logging.info('Querying plants list.')
             plants = client.get_plant_list()
             logging.info('- Found ' + str(len(plants)) + ' plants:')
-            [logging.info(' - ' + plant['stationName'] +
-                          ' (' + plant['stationCode'] + ')') for plant in plants]
+            [logging.info(' - ' + plant['plantName'] +
+                          ' (' + plant['plantCode'] + ')') for plant in plants]
             std_utils.to_csv(pd.DataFrame(plants), output /
                              std_utils.format_filename('plants', now))
 
             # Extract the list of plants code
-            plants_code = [plant['stationCode'] for plant in plants]
+            plants_code = [plant['plantCode'] for plant in plants]
 
             # Hourly data
             logging.info('Querying realtime data.')
@@ -95,4 +95,5 @@ if __name__ == '__main__':
 
     logging.basicConfig(level=args.loglevel.upper())
 
-    collect(output=Path(args.output), username=args.username, password=args.password, mock=args.mock)
+    collect(output=Path(args.output), username=args.username,
+            password=args.password, mock=args.mock)
