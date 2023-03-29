@@ -3,9 +3,9 @@ on:
   push:
     branches:
       - '*'
-      - '!main'
+      - 'main'
   schedule:
-    - cron: '0 23 * * *'
+    - cron: '20 21 * * *'
 jobs:
   Configure:
     runs-on: ubuntu-latest
