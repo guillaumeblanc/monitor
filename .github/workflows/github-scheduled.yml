@@ -1,11 +1,34 @@
 name: GitHub scheduled action
 on:
   push:
-  #schedule:
-  #  - cron: '*/15 6-22 * * *'
+    branches:
+      - '*'
+      - '!main'
+  schedule:
+    - cron: '0 23 * * *'
 jobs:
+  Configure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Branch check
+        id: branch_check
+        run: |
+          echo "Running on branch ${{github.ref}}"
+          if [ "${{github.ref}}" = "refs/heads/main" ]; then
+            echo "::set-output name=environment::Production"
+          else
+            echo "::set-output name=environment::Test"
+          fi
+      - name: Output environment
+        run: echo "Environment ${{steps.branch_check.outputs.environment}}"
+    outputs:
+      environment: ${{steps.branch_check.outputs.environment}}
+      
   FusionSolar:
     runs-on: ubuntu-latest
+    needs: [Configure]
+    environment: 
+      name: ${{needs.Configure.outputs.environment}}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -16,7 +39,7 @@ jobs:
       - name: Collect data
         run: |
           mkdir -p data/raw/fusion_solar
-          python etl_collect_fus.py -o data/raw/fusion_solar -u ${{secrets.FUSIONSOLAR_USER}} -p ${{secrets.FUSIONSOLAR_PASSWORD}} --mock
+          python etl_collect_fus.py -o data/raw/fusion_solar -u ${{secrets.FUSIONSOLAR_USER}} -p ${{secrets.FUSIONSOLAR_PASSWORD}}
       - name: Standardize data
         run: |
           mkdir -p data/std/fusion_solar
@@ -33,7 +56,9 @@ jobs:
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
   Aggregate:
-    needs: FusionSolar
+    needs: [FusionSolar, Configure]
+    environment: 
+      name: ${{needs.Configure.outputs.environment}}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -66,7 +91,9 @@ jobs:
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
   Report:
-    needs: Aggregate
+    needs: [Aggregate, Configure]
+    environment: 
+      name: ${{needs.Configure.outputs.environment}}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
