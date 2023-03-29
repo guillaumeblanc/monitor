@@ -5,7 +5,7 @@ on:
       - '*'
       - '!main'
   schedule:
-    - cron: '* 23 * * *'
+    - cron: '0 23 * * *'
 jobs:
   Configure:
     runs-on: ubuntu-latest
@@ -15,20 +15,20 @@ jobs:
         run: |
           echo "Running on branch ${{github.ref}}"
           if [ "${{github.ref}}" = "refs/heads/main" ]; then
-            echo "::set-output name=env_name::Production"
+            echo "::set-output name=environment::Production"
           else
-            echo "::set-output name=env_name::Test"
+            echo "::set-output name=environment::Test"
           fi
       - name: Output environment
-        run: echo "Environment ${{steps.branch_check.outputs.env_name}}"
+        run: echo "Environment ${{steps.branch_check.outputs.environment}}"
     outputs:
-      env_name: ${{steps.branch_check.outputs.env_name}}
+      environment: ${{steps.branch_check.outputs.environment}}
       
   FusionSolar:
     runs-on: ubuntu-latest
     needs: [Configure]
     environment: 
-      name: ${{needs.Configure.outputs.env_name}}
+      name: ${{needs.Configure.outputs.environment}}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -39,7 +39,7 @@ jobs:
       - name: Collect data
         run: |
           mkdir -p data/raw/fusion_solar
-          python etl_collect_fus.py -o data/raw/fusion_solar -u ${{secrets.FUSIONSOLAR_USER}} -p ${{secrets.FUSIONSOLAR_PASSWORD}} --mock
+          python etl_collect_fus.py -o data/raw/fusion_solar -u ${{secrets.FUSIONSOLAR_USER}} -p ${{secrets.FUSIONSOLAR_PASSWORD}}
       - name: Standardize data
         run: |
           mkdir -p data/std/fusion_solar
@@ -58,7 +58,7 @@ jobs:
   Aggregate:
     needs: [FusionSolar, Configure]
     environment: 
-      name: ${{needs.Configure.outputs.env_name}}
+      name: ${{needs.Configure.outputs.environment}}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -88,45 +88,5 @@ jobs:
         with:
           local_folder: 'data/agg'
           gdrive_subfolder: 'agg'
-          gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
-          gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
-  Report:
-    needs: [Aggregate, Configure]
-    environment: 
-      name: ${{needs.Configure.outputs.env_name}}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - name: Setup python
-        uses: ./extern/fusnic/.github/actions/setup_python
-        with:
-          requirements: 'requirements_report.txt'
-      - name: Download from Google Drive
-        uses: ./.github/actions/gdrive_download
-        with:
-          local_folder: 'data/agg'
-          gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
-          gdrive_subfolder: 'agg'
-          gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
-      - name: Build report
-        run: |
-          mkdir -p data/report
-          python3 -m nbconvert --execute --to html report.ipynb --output data/report/report.html
-      - name: Uploads artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: report
-          path: |
-            data/agg
-            data/report
-            report.ipynb
-      - name: Upload to Google Drive
-        uses: ./.github/actions/gdrive_upload
-        with:
-          local_folder: 'data/report'
-          gdrive_subfolder: 'report'
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
