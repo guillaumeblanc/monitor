@@ -1,11 +1,34 @@
 name: GitHub scheduled action
 on:
   push:
-  #schedule:
-  #  - cron: '*/15 6-22 * * *'
+    branches:
+      - '*'
+      - '!main'
+  schedule:
+    - cron: '* 23 * * *'
 jobs:
+  Configure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Branch check
+        id: branch_check
+        run: |
+          echo "Running on branch ${{github.ref}}"
+          if [ "${{github.ref}}" = "refs/heads/main" ]; then
+            echo "::set-output name=env_name::Production"
+          else
+            echo "::set-output name=env_name::Test"
+          fi
+      - name: Output environment
+        run: echo "Environment ${{steps.branch_check.outputs.env_name}}"
+    outputs:
+      env_name: ${{steps.branch_check.outputs.env_name}}
+      
   FusionSolar:
     runs-on: ubuntu-latest
+    needs: [Configure]
+    environment: 
+      name: ${{needs.Configure.outputs.env_name}}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -33,7 +56,9 @@ jobs:
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
   Aggregate:
-    needs: FusionSolar
+    needs: [FusionSolar, Configure]
+    environment: 
+      name: ${{needs.Configure.outputs.env_name}}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -66,7 +91,9 @@ jobs:
           gdrive_folder_id: ${{secrets.GDRIVE_FOLDER}}
           gdrive_credentials: ${{secrets.GDRIVE_CREDENTIALS}}
   Report:
-    needs: Aggregate
+    needs: [Aggregate, Configure]
+    environment: 
+      name: ${{needs.Configure.outputs.env_name}}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
