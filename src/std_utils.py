@@ -43,7 +43,7 @@ def typify(df: pd.DataFrame):
             df[col] = pd.Categorical(df[col])
 
     # Date
-    dates = ['collect_time']
+    dates = ['collect_time', 'alarm_raise_time']
     for col in df.columns:
         if col in dates:
             df[col] = pd.to_datetime(df[col])
@@ -52,7 +52,7 @@ def typify(df: pd.DataFrame):
 
 
 def file_patterns():
-    return ['plants', 'realtime', 'hourly', 'daily', 'monthly', 'yearly']
+    return ['plants', 'realtime', 'hourly', 'daily', 'monthly', 'yearly', 'alarms']
 
 
 def format_filename(key, time: datetime.datetime):
@@ -63,7 +63,8 @@ def format_filename(key, time: datetime.datetime):
         'hourly': year + 'hourly_' + time.strftime('%Y-%m-%d') + '.csv',
         'daily': year + 'daily_' + time.strftime('%Y-%m') + '.csv',
         'monthly': year + 'monthly_' + time.strftime('%Y') + '.csv',
-        'yearly': year + 'yearly_' + time.strftime('%Y') + '.csv'
+        'yearly': year + 'yearly_' + time.strftime('%Y') + '.csv',
+        'alarms': year + 'alarms_' + time.strftime('%Y-%m-%d') + '.csv'
     }
     return Path(formats[key])
 
@@ -94,7 +95,19 @@ def descriptions():
         'installed_capacity': 'Installed capacity kW',
         'performance_ratio': 'Performance ratio kWh',
         'use_power': 'Consumption (kWh)',
-        'perpower_ratio': 'Specific energy (kWh/kWp : h)'
+        'perpower_ratio': 'Specific energy (kWh/kWp : h)',
+        'alarm_name': 'Alarm name',
+        'device_name': 'Device name',
+        'alarm_solution': 'Solution',
+        'esnCode': 'Device SN',
+        'device_type_id': 'Device type ID',
+        'alarm_cause_id': 'Cause ID',
+        'alarm_cause': 'Alarm cause',
+        'alarm_type': 'Alarm type',
+        'alarm_raise_time': 'Alarm generation time',
+        'alarm_id': 'Alarm ID',
+        'alarm_severity': 'Alarm severity',
+        "alarm_status": 'Alarm status'
     }
 
 
