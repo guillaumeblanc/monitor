@@ -69,6 +69,13 @@ def collect(output: Path, username: str, password: str, mock: bool):
             logging.info('- Found ' + str(len(yearly)) + ' yearly data')
             std_utils.to_csv(fus_utils.flatten(yearly), output /
                              std_utils.format_filename('yearly', now))
+            
+            # Alarms data
+            logging.info('Querying alarms data.')
+            alarms = client.get_alarms_list(plants_code, datetime.datetime(2000, 1, 1), now)
+            logging.info('- Found ' + str(len(alarms)) + ' alarms')
+            std_utils.to_csv(fus_utils.flatten(alarms), output /
+                             std_utils.format_filename('alarms', now))
 
     except fusnic.LoginFailed:
         sys.exit(

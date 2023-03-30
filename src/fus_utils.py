@@ -16,9 +16,10 @@ def flatten(data):
             line['stationCode'] = entry['stationCode']
 
             # Fix up time
-            if entry.get('collectTime'):
-                line['collectTime'] = fusnic.Client.from_timestamp(
-                    entry['collectTime'])
+            dates = ['collect_time', 'alarm_raise_time']
+            for col in entry:
+                if col in dates:
+                    entry[col] = fusnic.Client.from_timestamp(entry[col])
 
             yield line
 
@@ -61,6 +62,19 @@ def descriptions():
         'reduction_total_co2': 'CO2 emission reduction (Ton)',
         'reduction_total_coal': 'Standard coal saved (Ton)',
         'reduction_total_tree': 'Equivalent trees planted',
+        'alarmName': 'Alarm name',
+        'devName' : 'Device name',
+        'repairSuggestion': 'Solution',
+        'esnCode' : 'Device SN',
+        'devTypeId': 'Device type ID',
+        'causeId' : 'Cause ID',
+        'alarmCause': 'Alarm cause',
+        'alarmType': 'Alarm type',
+        'raiseTime': 'Alarm generation time in milliseconds',
+        'alarmId': 'Alarm ID',
+        'stationName': 'Plant name',
+        'lev': 'Alarm severity',
+        "status": 'Alarm status: 1: not processed (active)'
     }
 
 
