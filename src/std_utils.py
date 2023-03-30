@@ -29,7 +29,7 @@ def from_csvs(path: Path, pattern: str):
     for filename in path.glob(pattern):
         aggregated = pd.concat([aggregated, from_csv(filename)])
 
-    aggregated.drop_duplicates(inplace=True)
+    aggregated.drop_duplicates(inplace=True, keep='last')
     aggregated = typify(aggregated)
 
     return aggregated
