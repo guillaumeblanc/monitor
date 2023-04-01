@@ -1,11 +1,12 @@
 from pathlib import Path
 import csv
 import datetime
+import pytz
 import pandas as pd
 from extern.fusnic import fusnic
 
 
-def flatten(data):
+def flatten(data, timezone):
     '''
     Convert list of dataItemMap to a flat list of data.
     Fixup also non standard units, like time
@@ -26,8 +27,8 @@ def flatten(data):
             dates = ['collectTime', 'raiseTime']
             for date in dates:
                 if date in line.keys():
-                    line[date] = fusnic.Client.from_timestamp(line[date])
-
+                    utc_date = fusnic.Client.from_timestamp(line[date])
+                    line[date] = utc_date.astimezone(timezone)
             yield line
 
     return pd.DataFrame(iterate(data))

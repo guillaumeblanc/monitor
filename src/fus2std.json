@@ -24,12 +24,12 @@
         "performance_ratio": "performance_ratio",
         "use_power": "use_power",
         "perpower_ratio": "perpower_ratio",
-        "devName" : "device_name",
-        "esnCode" : "device_sn",
+        "devName": "device_name",
+        "esnCode": "device_sn",
         "devTypeId": "device_type_id",
         "alarmName": "alarm_name",
         "repairSuggestion": "alarm_solution",
-        "causeId" : "alarm_cause_id",
+        "causeId": "alarm_cause_id",
         "alarmCause": "alarm_cause",
         "alarmType": "alarm_type",
         "raiseTime": "alarm_raise_time",
@@ -43,7 +43,7 @@
             "2": "Faulty",
             "3": "Healthy"
         },
-        "device_type_id":{
+        "device_type_id": {
             "1": "String inverter",
             "2": "SmartLogger",
             "8": "STS",
