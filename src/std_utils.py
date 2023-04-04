@@ -10,13 +10,10 @@ def to_csv(data: pd.DataFrame, path: Path):
     Dumps list of entries to csv.
     '''
     path.parent.mkdir(parents=True, exist_ok=True)
-
-    data.fillna('', inplace=True)
     data.to_csv(path, index=False)
 
 
 def from_csv(path: Path):
-
     df = pd.read_csv(str(path))
     return df
 
@@ -30,6 +27,7 @@ def from_csvs(path: Path, pattern: str):
         aggregated = pd.concat([aggregated, from_csv(filename)])
 
     aggregated.drop_duplicates(inplace=True, keep='last')
+    aggregated.fillna('', inplace=True)
     aggregated = typify(aggregated)
 
     return aggregated

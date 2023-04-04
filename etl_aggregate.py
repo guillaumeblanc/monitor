@@ -27,6 +27,7 @@ def aggregate(source: Path, destination: Path):
 
         dfile = destination / (pattern + '.csv')
         logging.info('Outputting file: %s.' % dfile)
+
         std_utils.to_csv(aggregated, dfile)
 
 
