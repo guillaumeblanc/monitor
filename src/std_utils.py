@@ -27,7 +27,7 @@ def from_csvs(path: Path, pattern: str):
         aggregated = pd.concat([aggregated, from_csv(filename)])
 
     aggregated.drop_duplicates(inplace=True, keep='last')
-    aggregated.fillna('', inplace=True)
+    aggregated.fillna(0, inplace=True)
     aggregated = typify(aggregated)
 
     return aggregated
@@ -44,7 +44,9 @@ def typify(df: pd.DataFrame):
     dates = ['collect_time', 'alarm_raise_time']
     for col in df.columns:
         if col in dates:
-            df[col] = pd.to_datetime(df[col])
+            # Consider all times in plant time zone
+            df[col] = pd.to_datetime(df[col], utc=False).map(
+                lambda x: x.replace(tzinfo=None))
 
     return df
 

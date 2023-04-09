@@ -66,7 +66,7 @@ def descriptions():
         'installed_capacity': 'Installed capacity kW',
         'performance_ratio': 'Performance ratio kWh',
         'use_power': 'Consumption (kWh)',
-        'perpower_ratio': 'Specific energy (kWh/kWp : h)',
+        'perpower_ratio': 'Specific energy (kWh/kWp)',
         'reduction_total_co2': 'CO2 emission reduction (Ton)',
         'reduction_total_coal': 'Standard coal saved (Ton)',
         'reduction_total_tree': 'Equivalent trees planted',
