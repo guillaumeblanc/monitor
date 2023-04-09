@@ -80,7 +80,8 @@ class GoogleDriveClient(GoogleDrive):
                          str(remote_subfolder))
 
         # Download filtered tree
-        event_loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
 
         async def async_download():
             futures = []
@@ -94,11 +95,11 @@ class GoogleDriveClient(GoogleDrive):
                     this_path.parent.mkdir(parents=True, exist_ok=True)
                     logging.info('Downloading file: %s, id: %s, mine: %s' % (
                         path, file['id'], file['mimeType']))
-                    futures.append(event_loop.run_in_executor(
+                    futures.append(loop.run_in_executor(
                         None, file.GetContentFile, this_path))
             [await f for f in futures]
 
-        event_loop.run_until_complete(async_download())
+        loop.run_until_complete(async_download())
 
     def upload(self, local: Path, remote_id: str, remote_subfolder: Path, match: str):
         if not local.exists():
@@ -136,7 +137,8 @@ class GoogleDriveClient(GoogleDrive):
                 remote_tree[path] = _create_file(path, True)
 
         # Upload local tree
-        event_loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
 
         async def async_upload():
             futures = []
@@ -155,12 +157,12 @@ class GoogleDriveClient(GoogleDrive):
                         str(path), file['id'], file['mimeType']))
                     file.SetContentFile(str(local_path))
                     futures.append(
-                        event_loop.run_in_executor(None, file.Upload))
+                        loop.run_in_executor(None, file.Upload))
 
             # Await completion
             [await f for f in futures]
 
-        event_loop.run_until_complete(async_upload())
+        loop.run_until_complete(async_upload())
 
 
 def authenticate(key):
