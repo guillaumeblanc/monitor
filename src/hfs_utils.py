@@ -3,7 +3,7 @@ import csv
 import datetime
 import pytz
 import pandas as pd
-from extern.fusnic import fusnic
+import pyhfs
 
 
 def flatten(data, timezone):
@@ -27,7 +27,7 @@ def flatten(data, timezone):
             dates = ['collectTime', 'raiseTime']
             for date in dates:
                 if date in line.keys():
-                    utc_date = fusnic.Client.from_timestamp(line[date])
+                    utc_date = pyhfs.Client.from_timestamp(line[date])
                     line[date] = utc_date.astimezone(timezone)
             yield line
 

@@ -8,7 +8,6 @@ import pandas as pd
 from pathlib import Path
 from datetime import datetime, timezone
 
-from extern.fusnic import fusnic
 import src.std_utils as std_utils
 
 

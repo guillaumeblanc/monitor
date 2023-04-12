@@ -28,7 +28,8 @@ top = st.container()
 with top:
     logo, title, trend = st.columns([1, 1, 10])
     with logo:
-        st.image('logo.png', use_column_width=True, output_format="auto")
+        st.image('resources/logo.png',
+                 use_column_width=True, output_format="auto")
     with title:
         # st.header("Supervision Eau & Soleil du Lac")
         pass
