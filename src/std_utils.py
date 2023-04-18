@@ -10,13 +10,10 @@ def to_csv(data: pd.DataFrame, path: Path):
     Dumps list of entries to csv.
     '''
     path.parent.mkdir(parents=True, exist_ok=True)
-
-    data.fillna('', inplace=True)
     data.to_csv(path, index=False)
 
 
 def from_csv(path: Path):
-
     df = pd.read_csv(str(path))
     return df
 
@@ -29,7 +26,8 @@ def from_csvs(path: Path, pattern: str):
     for filename in path.glob(pattern):
         aggregated = pd.concat([aggregated, from_csv(filename)])
 
-    aggregated.drop_duplicates(inplace=True)
+    aggregated.drop_duplicates(inplace=True, keep='last')
+    aggregated.fillna(0, inplace=True)
     aggregated = typify(aggregated)
 
     return aggregated
@@ -46,13 +44,15 @@ def typify(df: pd.DataFrame):
     dates = ['collect_time', 'alarm_raise_time']
     for col in df.columns:
         if col in dates:
-            df[col] = pd.to_datetime(df[col])
+            # Consider all times in plant time zone
+            df[col] = pd.to_datetime(df[col], utc=False).map(
+                lambda x: x.replace(tzinfo=None))
 
     return df
 
 
 def file_patterns():
-    return ['plants', 'realtime', 'hourly', 'daily', 'monthly', 'yearly']
+    return ['plants', 'realtime', 'hourly', 'daily', 'monthly', 'yearly', 'alarms']
 
 
 def format_filename(key, time: datetime.datetime):
@@ -92,16 +92,14 @@ def descriptions():
         'inverter_power': 'Inverter yield (kWh)',
         'ongrid_power': 'Feed-in energy',
         'power_profit': 'Revenue',
-        'installed_capacity': 'Installed capacity kW',
         'performance_ratio': 'Performance ratio kWh',
         'use_power': 'Consumption (kWh)',
-        'perpower_ratio': 'Specific energy (kWh/kWp : h)',
         'alarm_name': 'Alarm name',
-        'device_name' : 'Device name',
+        'device_name': 'Device name',
         'alarm_solution': 'Solution',
-        'esnCode' : 'Device SN',
+        'esnCode': 'Device SN',
         'device_type_id': 'Device type ID',
-        'alarm_cause_id' : 'Cause ID',
+        'alarm_cause_id': 'Cause ID',
         'alarm_cause': 'Alarm cause',
         'alarm_type': 'Alarm type',
         'alarm_raise_time': 'Alarm generation time',

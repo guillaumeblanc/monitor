@@ -9,5 +9,5 @@ Collected and aggregated data are stored on Google drive, which requires a Googl
 Here's a procedure example: https://blog.zephyrok.com/google-drive-api-with-service-account-in-python/
 
 # Dependencies
-- Huawei Fusion Solar Northbound interface client: [fusnic](https://github.com/guillaumeblanc/fusnic/)
+- Huawei Fusion Solar Northbound interface client: [pyhfs](https://github.com/guillaumeblanc/pyhfs/)
 - pydrive

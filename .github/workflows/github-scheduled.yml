@@ -35,7 +35,7 @@ jobs:
         with:
           submodules: recursive
       - name: Setup python
-        uses: ./extern/fusnic/.github/actions/setup_python
+        uses: ./.github/actions/setup_python
       - name: Collect data
         run: |
           mkdir -p data/raw/fusion_solar
@@ -66,7 +66,7 @@ jobs:
         with:
           submodules: recursive
       - name: Setup python
-        uses: ./extern/fusnic/.github/actions/setup_python
+        uses: ./.github/actions/setup_python
       - name: Download from Google Drive
         uses: ./.github/actions/gdrive_download
         with:

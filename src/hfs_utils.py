@@ -1,26 +1,34 @@
 from pathlib import Path
 import csv
 import datetime
+import pytz
 import pandas as pd
-from extern.fusnic import fusnic
+import pyhfs
 
 
-def flatten(data):
+def flatten(data, timezone):
     '''
     Convert list of dataItemMap to a flat list of data.
     Fixup also non standard units, like time
     '''
     def iterate(data):
         for entry in data:
-            line = entry['dataItemMap']
-            line['stationCode'] = entry['stationCode']
+            line = entry.get('dataItemMap')
+            if line:
+                line['stationCode'] = entry['stationCode']
+            else:
+                line = entry
+
+            # Copy collect time
+            if 'collectTime' in entry.keys():
+                line['collectTime'] = entry['collectTime']
 
             # Fix up time
-            dates = ['collect_time', 'alarm_raise_time']
-            for col in entry:
-                if col in dates:
-                    entry[col] = fusnic.Client.from_timestamp(entry[col])
-
+            dates = ['collectTime', 'raiseTime']
+            for date in dates:
+                if date in line.keys():
+                    utc_date = pyhfs.Client.from_timestamp(line[date])
+                    line[date] = utc_date.astimezone(timezone)
             yield line
 
     return pd.DataFrame(iterate(data))
@@ -58,16 +66,16 @@ def descriptions():
         'installed_capacity': 'Installed capacity kW',
         'performance_ratio': 'Performance ratio kWh',
         'use_power': 'Consumption (kWh)',
-        'perpower_ratio': 'Specific energy (kWh/kWp : h)',
+        'perpower_ratio': 'Specific energy (kWh/kWp)',
         'reduction_total_co2': 'CO2 emission reduction (Ton)',
         'reduction_total_coal': 'Standard coal saved (Ton)',
         'reduction_total_tree': 'Equivalent trees planted',
         'alarmName': 'Alarm name',
-        'devName' : 'Device name',
+        'devName': 'Device name',
         'repairSuggestion': 'Solution',
-        'esnCode' : 'Device SN',
+        'esnCode': 'Device SN',
         'devTypeId': 'Device type ID',
-        'causeId' : 'Cause ID',
+        'causeId': 'Cause ID',
         'alarmCause': 'Alarm cause',
         'alarmType': 'Alarm type',
         'raiseTime': 'Alarm generation time in milliseconds',
