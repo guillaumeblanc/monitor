@@ -93,6 +93,7 @@ def descriptions():
         'ongrid_power': 'Feed-in energy',
         'power_profit': 'Revenue',
         'performance_ratio': 'Performance ratio kWh',
+        'perpower_ratio': 'Specific energy (kWh/kWp)',
         'use_power': 'Consumption (kWh)',
         'alarm_name': 'Alarm name',
         'device_name': 'Device name',
