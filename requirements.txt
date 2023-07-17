@@ -3,6 +3,3 @@ argparse
 pydrive
 pytz
 pyhfs>=0.1.1
-streamlit
-streamlit_extras
-plotly
