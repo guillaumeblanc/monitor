@@ -96,7 +96,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', default='out',
                         help='Output directory. Example --output your_path, default=out')
     parser.add_argument('-d', '--date', default='',
-                        help='Collection date with format d/m/Y. Example --date 07/07/2023, default to now')
+                        help='Collection date in ISO 8601 format. Example --date 2023-07-17, default to now')
     parser.add_argument('-m', '--mock', default=False, action=argparse.BooleanOptionalAction,
                         help='Mock fusion solar data')
     parser.add_argument('-t', '--timezone',
@@ -107,8 +107,8 @@ if __name__ == '__main__':
 
     logging.basicConfig(level=args.loglevel.upper())
 
-    date = datetime.strptime(
-        args.date, '%d/%m/%Y') if args.date else datetime.now(tz=timezone.utc)
+    date = datetime.fromisoformat(
+        args.date) if args.date else datetime.now(tz=timezone.utc)
 
     collect(output=Path(args.output), username=args.username,
             password=args.password, date=date, tz=pytz.timezone(args.timezone), mock=args.mock)
