@@ -1,0 +1,5 @@
+pandas
+argparse
+pydrive
+pytz
+pyhfs>=0.1.1

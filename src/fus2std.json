@@ -1,0 +1,81 @@
+{
+    "columns": {
+        "plantCode": "plant_code",
+        "stationCode": "plant_code",
+        "plantName": "plant_name",
+        "stationName": "plant_name",
+        "plantAddress": "plant_addr",
+        "longitude": "longitude",
+        "latitude": "latitude",
+        "collectTime": "collect_time",
+        "capacity": "capacity",
+        "real_health_state": "health_state",
+        "day_power": "day_power",
+        "month_power": "month_power",
+        "total_power": "total_power",
+        "day_income": "day_income",
+        "total_income": "total_income",
+        "radiation_intensity": "radiation_intensity",
+        "theory_power": "theory_power",
+        "inverter_power": "inverter_power",
+        "ongrid_power": "ongrid_power",
+        "power_profit": "power_profit",
+        "performance_ratio": "performance_ratio",
+        "use_power": "use_power",
+        "devName": "device_name",
+        "esnCode": "device_sn",
+        "devTypeId": "device_type_id",
+        "alarmName": "alarm_name",
+        "repairSuggestion": "alarm_solution",
+        "causeId": "alarm_cause_id",
+        "alarmCause": "alarm_cause",
+        "alarmType": "alarm_type",
+        "raiseTime": "alarm_raise_time",
+        "alarmId": "alarm_id",
+        "lev": "alarm_severity",
+        "status": "alarm_status"
+    },
+    "values": {
+        "health_state": {
+            "1": "Disconnected",
+            "2": "Faulty",
+            "3": "Healthy"
+        },
+        "device_type_id": {
+            "1": "String inverter",
+            "2": "SmartLogger",
+            "8": "STS",
+            "10": "EMIv",
+            "13": "Protocol converter",
+            "16": "General device",
+            "17": "Grid meter",
+            "22": "PID",
+            "37": "Pinnet data logger",
+            "38": "Residential inverter",
+            "39": "Battery",
+            "40": "Backup box",
+            "45": "PLC",
+            "46": "Optimizer",
+            "47": "Power sensor",
+            "62": "Dongle",
+            "63": "Distributed SmartLogger",
+            "70": "Safety box"
+        },
+        "alarm_type": {
+            "1": "Transposition signal",
+            "2": "Exception alarm",
+            "3": "Protection event",
+            "4": "Notification status",
+            "5": "Alarm information"
+        },
+        "alarm_severity": {
+            "1": "Critical",
+            "2": "Major",
+            "3": "Minor",
+            "4": "Warning"
+        },
+        "alarm_status": {
+            "1": "Active"
+        }
+    }
+}
