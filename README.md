@@ -10,4 +10,4 @@ Here's a procedure example: https://blog.zephyrok.com/google-drive-api-with-serv
 
 # Dependencies
 - Huawei Fusion Solar Northbound interface client: [pyhfs](https://github.com/guillaumeblanc/pyhfs/)
-- pydrive
+- pydrive wrapper library of google-api-python-client 
