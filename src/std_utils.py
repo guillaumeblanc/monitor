@@ -109,13 +109,11 @@ def descriptions():
         "alarm_status": 'Alarm status'
     }
 
-
 def description(parameter: str):
     '''
     Gets description from column name.
     '''
     return descriptions().get(parameter, 'Unknown')
-
 
 def health_state_colormap():
     return {'Healthy': 'green', 'Disconnected': 'orange', 'Faulty': 'red'}
