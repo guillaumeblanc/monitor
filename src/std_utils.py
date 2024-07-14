@@ -45,7 +45,7 @@ def typify(df: pd.DataFrame):
     for col in df.columns:
         if col in dates:
             # Consider all times in plant time zone
-            df[col] = pd.to_datetime(df[col], utc=False).map(
+            df[col] = pd.to_datetime(df[col], utc=False, format='mixed').map(
                 lambda x: x.replace(tzinfo=None))
 
     return df
